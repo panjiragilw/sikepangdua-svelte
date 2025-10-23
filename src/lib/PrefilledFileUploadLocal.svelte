@@ -54,6 +54,7 @@
     "srt-pltkn-jbtrk": { types: ['application/pdf'], maxSizeMB: 2 },
     "sk-kptrk": { types: ['application/pdf'], maxSizeMB: 2 },
     "sk-jbatlng": { types: ['application/pdf'], maxSizeMB: 2 },
+    "sk-kpbr": { types: ['application/pdf'], maxSizeMB: 2 },
   };
 
   let errors: Record<string, string> = {};

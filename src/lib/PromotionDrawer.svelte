@@ -1,16 +1,18 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
-  import { Button, Heading, Input, Label, Select, Textarea, Drawer, P } from 'flowbite-svelte';
-  import { CloseOutline } from 'flowbite-svelte-icons';
-  import type { DocumentPoolDrawerProps } from './types';
+  import { Button, Heading, Input, Label, Select, Textarea, Drawer, P, Popover } from 'flowbite-svelte';
+  import { CloseOutline, QuestionCircleSolid } from 'flowbite-svelte-icons';
+  import type { DocumentPoolDrawerProps, LegalDocument } from './types';
   import type { Attachment } from 'svelte/attachments';
   import type { Rank } from '$lib/types'
+  import PrefilledFileUploadLocal from './PrefilledFileUploadLocal.svelte';
 
   let { open = $bindable(false), title = 'Promoted Employee', data = {}, documents = [], prefilledUrls = $bindable({}), additionalFields = [], ...formAttrs }: DocumentPoolDrawerProps = $props();
 
   const dispatch = createEventDispatcher();
 
   const prefill: Attachment<HTMLFormElement> = (form) => {
+    // console.log("documents: ", documents);
     // console.log("form: ", form)
     const fill = (vals: Record<string, unknown> = {}) => {
       // console.log("vals: ", vals)
@@ -66,7 +68,25 @@
       payload[key] = value;
     }
 
-    dispatch('promoted', payload);
+    const allDocuments = documents as LegalDocument[] | undefined; 
+    
+    allDocuments?.forEach(doc => {
+      const code = doc.document_type.code;
+      switch (code) {
+        case 'SKP1ST':
+            payload["skp_1_doc_id"] = doc.id;
+            break;
+        case 'SKP2ND':
+            payload["skp_2_doc_id"] = doc.id;
+            break;
+        case 'SKKPTR': 
+            payload["sk_kp_doc_id"] = doc.id;
+            break;
+          // Tambahkan case lain jika diperlukan
+      }
+    });
+
+    dispatch('submit', payload);
     console.log("DISPATCHED promoted: ", payload);
     
     open = false;
@@ -84,6 +104,12 @@
   let currentRankName: string = $derived(String(data.rank_name) || "");
   let currentGroupClassName: string = $derived(String(data.group_class_name) || "");
   let isEligible: boolean = $derived(Boolean(data.is_eligible) || false); 
+  let submitButtonDisabled: boolean = $state(true);
+
+  function handleFileChange(e: Event) {
+    e.preventDefault();
+    submitButtonDisabled = false; 
+  }
         
   async function fetchRankList(): Promise<void> {
     const apiURL = `http://localhost:9091/api/employee/ranks`;
@@ -109,8 +135,6 @@
       ranks?.find(r => r.id === (selectedRankId ? Number(selectedRankId) : null)) || null
   );
 
-  // console.log(sRank);
-
   onMount(() => {
     fetchRankList();
   });
@@ -129,7 +153,7 @@
     <!-- Konten scrollable -->
     <div class="flex-1 overflow-y-auto px-4 pt-2 pb-32 space-y-4">
       <Label class="space-y-2">
-        <span>Eligibility Status</span>
+        <span>Promotion Eligibility Status</span>
         {#if isEligible} 
           <P size="lg" class="text-green-600 dark:text-green-500">Eligible</P>
         {:else}
@@ -159,9 +183,11 @@
           bind:value={selectedRankId}
           placeholder="Choose Rank" required>
           {#each ranks || [] as {id, name, group_class_name}}
-            <option value={id} disabled={id <= currentEmployeeRankId}>
+            {#if id > currentEmployeeRankId}
+              <option value={id} disabled={id !== currentEmployeeRankId + 1}>
                 {name} ({group_class_name})
-            </option>
+              </option>
+            {/if}
           {/each}
         </Select>
 
@@ -183,6 +209,29 @@
         />
       </Label>
 
+      <div class="space-y-1">
+        <Label for="sk-kpbr">SK KP
+          <button>
+                  <span class="sr-only">Show reason</span>
+                  <QuestionCircleSolid size="xs" class="text-gray-400 hover:text-gray-500" />
+                </button>
+          <Popover placement="bottom-start">
+            <div class="w-72 space-y-1 text-xs font-normal text-gray-500 dark:text-gray-300">
+              <h3 class="font-semibold text-gray-900 dark:text-white">Which one?</h3>
+              {#if popoverReasons}
+                {@render popoverReasons()}
+              {/if}
+            </div>
+          </Popover>
+        </Label>
+        {#snippet popoverReasons()}
+          The latest SK KP after the employee has been promoted to a new rank.
+        {/snippet}
+        <PrefilledFileUploadLocal name="sk-kpbr"
+         on:fileChange={(e) => handleFileChange(e)} 
+      />
+      </div>
+
     </div>
 
     <!-- Tombol floating -->
@@ -193,7 +242,9 @@
        </div>
       {/if}
       <div class="flex justify-center space-x-4">
-        <Button type="submit" class="w-full" disabled={!isEligible}>Promoted</Button>
+        {#if (isEligible)}
+          <Button type="submit" class="w-full" disabled={submitButtonDisabled}>Promoted</Button>
+        {/if}
         <Button color="alternative" class="w-full" onclick={() => {(open = false)}}>
           <CloseOutline />
           Cancel

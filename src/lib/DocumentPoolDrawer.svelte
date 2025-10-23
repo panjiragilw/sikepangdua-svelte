@@ -281,39 +281,35 @@
 
     // console.log("jsonPayload: ", jsonPayload, performanceDetailId);
     if (json.length > 1) {
-      
-    
+      if (performanceDetailId > 0) {
+        //  console.log("update pd: ", jsonPayload);
+        // update performance detail
+        const res = await fetch(`http://localhost:9091/api/employee/detail/performance/${performanceDetailId}`, {
+          method: 'PUT',
+          body: JSON.stringify(jsonPayload), 
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
+        if (!res.ok) {
+          console.error(`Failed when update performance detail for ${docKey}. Status: ${res.status}`);
+        } 
+      } else {
+        // insert performance detail
+        // console.log("insert pd: ", jsonPayload);
+        const res = await fetch(`http://localhost:9091/api/employee/detail/performance`, {
+          method: 'POST',
+          body: JSON.stringify(jsonPayload), 
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-    if (performanceDetailId > 0) {
-      //  console.log("update pd: ", jsonPayload);
-      // update performance detail
-      const res = await fetch(`http://localhost:9091/api/employee/detail/performance/${performanceDetailId}`, {
-        method: 'PUT',
-        body: JSON.stringify(jsonPayload), 
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!res.ok) {
-        console.error(`Failed when update performance detail for ${docKey}. Status: ${res.status}`);
-      } 
-    } else {
-      // insert performance detail
-      // console.log("insert pd: ", jsonPayload);
-      const res = await fetch(`http://localhost:9091/api/employee/detail/performance`, {
-        method: 'POST',
-        body: JSON.stringify(jsonPayload), 
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!res.ok) {
-        console.error(`Failed when insert performance detail for ${docKey}. Status: ${res.status}`);
-      } 
-    }
+        if (!res.ok) {
+          console.error(`Failed when insert performance detail for ${docKey}. Status: ${res.status}`);
+        } 
+      }
     }
 
   
@@ -325,12 +321,7 @@
     
     const form = e.currentTarget as HTMLFormElement;
     const initialFormData = new FormData(form);
-
-    // 1. Convert FormData ke object biasa untuk inspeksi
     const formEntryData = Object.fromEntries(initialFormData.entries());
-    // console.log("formEntryData: ", formEntryData);
-    // console.log("skpData: ", skpData);
-    // return
 
     const existingDocKeys = Object.keys(prefilledUrls);
     
@@ -338,9 +329,7 @@
     let allSuccess = true;
 
     for (const [key, value] of Object.entries(formEntryData)) {
-      // Hanya proses field yang berisi objek File dan bukan field lain
       if (value instanceof File && key !== 'ein' && key !== 'name') {
-        // Pastikan file tidak kosong
         if (value.name === "" || value.size < 1) {
           continue;
         }

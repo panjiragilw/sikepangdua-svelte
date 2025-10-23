@@ -62,25 +62,6 @@
   
   let legalDocs = $state<LegalDocument[] | undefined>(undefined);
 
-  // function calculateOverdueMonths(dueDate: Date, targetDate: Date): number {
-  //   // Ambil tanggal cutoff: tanggal 15 di bulan dueDate
-  //   const cutoff = new Date(
-  //     dueDate.getFullYear(),
-  //     dueDate.getMonth(),
-  //     15, 0, 0, 0, 0
-  //   );
-
-  //   if (targetDate < cutoff) {
-  //     return 0; // belum melewati deadline
-  //   }
-
-  //   const years = targetDate.getFullYear() - cutoff.getFullYear();
-  //   const months = targetDate.getMonth() - cutoff.getMonth();
-
-  //   return years * 12 + months;
-  // }
-
-   // State
   export const overdues = $state<Array<PromotionWithCategory>>([]);
   export const dueSoon = $state<Array<PromotionWithCategory>>([]);
   export const upcomings = $state<Array<PromotionWithCategory>>([]);
@@ -95,19 +76,15 @@
     name?: string
   ) {
     tableLoading = true;
-    // await fetchPromotionList();
-    // Gunakan Promise.all untuk menunggu fetch dan delay minimal
     try {
         const [_, successResponse] = await Promise.all([
-            new Promise(resolve => setTimeout(resolve, 300)), // Delay visual
-            fetchPromotionList(name) // Ini akan mengembalikan successResponse.data dan meta
+            new Promise(resolve => setTimeout(resolve, 300)),
+            fetchPromotionList(name)
         ]);
         
-        // 1. Ambil data mentah dan tambahkan properti 'category'
-        // Gunakan as PromotionWithCategory[] untuk Type Safety
         const overdueList = (promotions?.regular_promotions?.overdue_promotions ?? []).map(p => ({
             ...p,
-            category: 'overdue' as const // Menggunakan 'as const' untuk literal type
+            category: 'overdue' as const 
         })) as PromotionWithCategory[];
         
         const soonList = (promotions?.regular_promotions?.due_soon_promotions ?? []).map(p => ({
@@ -120,22 +97,19 @@
             category: 'upcoming' as const
         })) as PromotionWithCategory[];
 
-        // 2. Isi array state (menggunakan array dengan tipe yang sudah ditandai)
         overdues.splice(0, overdues.length, ...overdueList);
         dueSoon.splice(0, dueSoon.length, ...soonList);
         upcomings.splice(0, upcomings.length, ...upcomingList);
 
-        // 3. Gabungkan employeePromotions. Ini TIDAK AKAN ERROR karena array sumber memiliki tipe yang benar
         employeePromotions.splice(0, employeePromotions.length, ...overdues, ...dueSoon, ...upcomings);
 
         eligibleCount = promotions?.eligible_count ?? 0;
         notEligibleCount = (promotions?.total_count ?? 0) - (promotions?.eligible_count ?? 0);
 
     } catch (e) {
-        // Log error jika ada masalah di salah satu promise
         console.error("Error during data fetching and delay:", e);
     } finally {
-        tableLoading = false; // ✅ NONAKTIFKAN LOADING setelah semua proses selesai
+        tableLoading = false; 
     }
   }
 
@@ -170,7 +144,7 @@
 
   const toggle = async (ein: string) => {
     // DrawerComponent = component;
-    openDocument = true;
+    // openDocument = true;
 
     try {
       const res = await fetch(`http://localhost:9091/api/employee/documents/legal?ein=${ein}`);
@@ -191,11 +165,67 @@
     return reason.replace("Missing required document: ", "");
   }
 
-  async function handlePromotedEmployee(e: CustomEvent) {
+  // Handle document of promoted employee
+  async function handleDocumentPromoted(e: CustomEvent) {
     e.preventDefault();
-    const payload = e.detail; // Ini adalah payload dari modal
+    const payload = e.detail;
+    // console.log("payload: ", payload);
+    
+    const promotedFile = payload['sk-kpbr'] as File;
+
+    const skp1DocId = payload['skp_1_doc_id'] || payload.skp_1_doc_id; // Cek mana yang benar di payload Anda
+    const skp2DocId = payload['skp_2_doc_id'] || payload.skp_2_doc_id;
+    const skKpDocId = payload['sk_kp_doc_id'] || payload.sk_kp_doc_id;
+
+    if (!(promotedFile instanceof File) || promotedFile.size === 0) {
+        console.error("No valid promotion file found in payload.");
+        return;
+    }
+
+    try {
+        // 3. Build the final FormData for the API call
+        const uploadFormData = new FormData();
+        
+        // Append all required IDs (pastikan tipe data di payload Anda adalah string atau number)
+        uploadFormData.append('skp_1_doc_id', skp1DocId.toString());
+        uploadFormData.append('skp_2_doc_id', skp2DocId.toString());
+        uploadFormData.append('sk_kp_doc_id', skKpDocId.toString());
+        
+        // Ambil employee ID dari payload
+        uploadFormData.append('employee_id', payload.id.toString()); 
+        
+        // Append document type ID (asumsi hardcoded '17' adalah tipe untuk SK-KPBR)
+        uploadFormData.append('document_type_id', "17"); 
+        
+        // Append the actual file
+        uploadFormData.append('document_file', promotedFile);
+
+        // 4. Execute the single API call
+        const res = await fetch('http://localhost:9091/api/employee/promoted', {
+            method: 'POST',
+            body: uploadFormData, 
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Upload failed. Status: ${res.status}. Response: ${errorText}`);
+        }
+        
+        console.log("Promotion document uploaded and data updated successfully.");
+
+    } catch (e) {
+        console.error("Failed to handle promotion document:", e);
+    }
+  }
+
+  // Handle promoted employee
+  async function handlePromotedEmployee(e: CustomEvent) {
+    const payload = e.detail; 
     // console.log("Receive event PROMOTE) with payload:", payload);
     
+    // Hit API handle promoted employee docs
+    await handleDocumentPromoted(e);
+
     const allowedKeysStr = [ 
       "sds_last_group", 
     ];
@@ -217,9 +247,10 @@
     // console.log("UPDATE PROMOTE with:", jsonPayload);
     // return;
 
-    // Hit API add employee
+    // Hit API update employee
     try {
       const jsonPayloadStr = JSON.stringify(jsonPayload);
+      // console.log("jsonPayloadStr: ", jsonPayloadStr);
       const res = await fetch(`http://localhost:9091/api/employee/${payload.id}`, {
         method: 'PUT',
         body: jsonPayloadStr, 
@@ -334,7 +365,7 @@
               
               {#snippet popoverReasons()}
               <ul>
-                {#if promotion.reasons.unfulfilled_requirements.length > 0}
+                {#if promotion.reasons.unfulfilled_requirements && promotion.reasons.unfulfilled_requirements.length > 0}
                   <P size="xs" class="text-red-500 dark:text-red-400">Unfulfilled Requirements:</P>
                   {#each promotion.reasons.unfulfilled_requirements as unfulfilled_req}
                     <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400">
@@ -343,9 +374,9 @@
                       </Li>
                     </List>
                   {/each}
+                  <br/>
                 {/if}
-                <br/>
-                {#if promotion.reasons.unfulfilled_requirements.length > 0}
+                {#if promotion.reasons.missing_documents && promotion.reasons.missing_documents.length > 0}
                   <P size="xs" class="text-red-500 dark:text-red-400">Missing Documents:</P>
                   {#each promotion.reasons.missing_documents as missing_doc}
                     <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400">
@@ -360,10 +391,18 @@
             {/if}
           </TableBodyCell>
           <TableBodyCell class="space-x-2">
-            <Button size="sm" color="alternative" class="gap-2 px-3" onclick={() => ((employees_data = {"id": promotion.id, "name": promotion.name, "ein": promotion.ein}), toggle(promotion.ein))}>
+            <Button size="sm" color="alternative" class="gap-2 px-3" onclick={() => ((employees_data = {"id": promotion.id, "name": promotion.name, "ein": promotion.ein}), toggle(promotion.ein), openDocument = true)}>
               <EyeOutline size="sm" /> Details
             </Button>
-            <Button size="sm" class="gap-2 px-3" onclick={() => ((employees_data = {"id": promotion.id, "name": promotion.name, "ein": promotion.ein, "rank_name": promotion.rank, "group_class_name": promotion.group_class, "rank_id": promotion.rank_id, "is_eligible": promotion.is_eligible}), (openPromoted = true))}>
+            <Button size="sm" class="gap-2 px-3" onclick={() => ((employees_data = {
+              "id": promotion.id, 
+              "name": promotion.name, 
+              "ein": promotion.ein, 
+              "rank_name": promotion.rank, 
+              "group_class_name": promotion.group_class, 
+              "rank_id": promotion.rank_id, 
+              "is_eligible": promotion.is_eligible,
+              }), toggle(promotion.ein), (openPromoted = true))}>
               <AwardOutline size="sm" /> Promoted
             </Button>
           </TableBodyCell>
@@ -386,6 +425,7 @@
   <PromotionDrawer 
     bind:open={openPromoted} 
     data={employees_data} 
-    on:promoted={handlePromotedEmployee}
+    documents={legalDocs}
+    on:submit={handlePromotedEmployee}
   />
 {/if}
