@@ -129,7 +129,7 @@ export interface UserMenuProps {
   name: string;
   avatar: string;
   email: string;
-  menuItems: string[];
+  menuItems?: string[];
   children?: Snippet;
   placement?: DropdownProps['placement'];
 }

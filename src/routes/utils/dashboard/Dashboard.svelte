@@ -191,9 +191,7 @@
 </script>
 
 <div class="mt-px space-y-4">
- 
-  <div class="grid grid-cols-2 gap-4 xl:grid-cols-2">
-    <!-- <Chat /> -->
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
     <div class="flex flex-col gap-4">
 
       <Traffic devices={traffPromotions()}>
@@ -206,8 +204,9 @@
     </div>
     <Stats eligible={eligibles} notEligible={notEligibles} {...statsCont}></Stats>
   </div>
-   <div class="grid gap-4 ">
-{#if series[0].data.some(d => d > 0)}
-        <ChartWidget chartOptions={chartOptions} title="2025" subtitle="Promotion" />
-    {/if}  </div>
+  <div class="grid gap-4 ">
+    {#if series[0].data.some(d => d > 0)}
+      <ChartWidget chartOptions={chartOptions} title="2025" subtitle="Promotion" />
+    {/if}  
+  </div>
 </div>

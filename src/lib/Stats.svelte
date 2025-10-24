@@ -17,18 +17,6 @@
     <Heading tag="h3" class="w-fit text-lg font-semibold dark:text-white">
       {title}
     </Heading>
-    <!-- <button>
-      <span class="sr-only">Show information</span>
-      <QuestionCircleSolid size="sm" class="text-gray-400 hover:text-gray-500" />
-    </button>
-    <Popover placement="bottom-start">
-      <div class="w-72 space-y-2 text-sm font-normal text-gray-500 dark:text-gray-300">
-        <h3 class="font-semibold text-gray-900 dark:text-white">{popoverTitle}</h3>
-        {#if popoverDesc}
-          {@render popoverDesc()}
-        {/if}
-      </div>
-    </Popover> -->
   </div>
     
   <Tabs style="full" class="flex divide-x divide-gray-200 shadow rtl:divide-x-reverse dark:divide-gray-700" classes={{ content: 'p-3 mt-4 min-h-[24rem]' }}>
@@ -50,31 +38,7 @@
                   <p class="truncate font-medium text-gray-900 dark:text-white">
                     {name}
                   </p>
-                  <!-- <Change value={change} size="sm" equalHeight class="ml-px" /> -->
-                  <!-- {#if reasons && reasons.length > 0} 
-                  <P size="xs" class="text-primary-700 dark:text-primary-500">Not Eligible
-                    <button>
-                      <span class="sr-only">Show reason</span>
-                      <QuestionCircleSolid size="xs" class="text-gray-400 hover:text-gray-500" />
-                    </button>
-                    <Popover placement="bottom-start">
-                      <div class="w-72 space-y-1 text-xs font-normal text-gray-500 dark:text-gray-300">
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Reason(s)</h3>
-                        {#if popoverReasons}
-                          {@render popoverReasons()}
-                        {/if}
-                      </div>
-                    </Popover>
-                  </P>
-                  
-                  {#snippet popoverReasons()}
-                  {#each reasons as reason}
-                    <P size="xs">- {reason}</P>
-                  {/each}
-                  {/snippet}
-                  {:else}
                   <P size="xs" class="text-green-700 dark:text-green-500">Eligible</P>
-                  {/if} -->
                 </div>
               </div>
               <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
@@ -119,10 +83,10 @@
                         </div>
                       </Popover>
                     </P>
-                    
                     {#snippet popoverReasons()}
                       <ul>
-                        <!-- {#if reason.unfulfilled_requirements.length > 0} -->
+                        {#if reasons.unfulfilled_requirements && reasons.unfulfilled_requirements.length > 0}
+                          <P size="xs" class="text-red-500 dark:text-red-400">Unfulfilled Requirements:</P>
                           {#each reasons.unfulfilled_requirements as unfulfilled_req}
                             <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400">
                               <Li icon>
@@ -130,9 +94,11 @@
                               </Li>
                             </List>
                           {/each}
-                        <!-- {/if} -->
+                          <br/>
+                        {/if}
 
-                        <!-- {#if reason.missing_documents.length > 0} -->
+                        {#if reasons.missing_documents && reasons.missing_documents.length > 0}
+                          <P size="xs" class="text-red-500 dark:text-red-400">Missing Documents:</P>
                           {#each reasons.missing_documents as missing_doc}
                             <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400">
                               <Li icon>
@@ -140,7 +106,7 @@
                               </Li>
                             </List>
                           {/each}
-                        <!-- {/if} -->
+                        {/if}
                       </ul>
                     {/snippet}
                   {/if}
