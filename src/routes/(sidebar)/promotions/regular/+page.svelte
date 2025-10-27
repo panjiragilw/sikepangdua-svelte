@@ -44,7 +44,13 @@
 
     try {
       const res = await fetch(apiURL);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      // if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      const contentType = res.headers.get('content-type') ?? '';
+      if (!res.ok || !contentType.includes('application/json')) {
+        const text = await res.text();
+        console.error("Unexpected response:", text.slice(0, 100));
+        throw new Error(`Unexpected response: ${res.status}`);
+      }
       const json = (await res.json()) as ApiPromotionListResponseSuccess | ApiPromotionListResponseError;
       if (json.status !== 200) {
         const errJson = json as ApiPromotionListResponseError;
@@ -148,7 +154,13 @@
 
     try {
       const res = await fetch(`/api/employee/documents/legal?ein=${ein}`);
-      if (!res.ok) throw new Error(`Failed to fetch documents`);
+      // if (!res.ok) throw new Error(`Failed to fetch documents`);
+      const contentType = res.headers.get('content-type') ?? '';
+      if (!res.ok || !contentType.includes('application/json')) {
+        const text = await res.text();
+        console.error("Unexpected response:", text.slice(0, 100));
+        throw new Error(`Unexpected response: ${res.status}`);
+      }
       const json = await res.json();
       legalDocs = []; // reset first
       legalDocs = json.data as LegalDocument[]; // assign new array

@@ -28,7 +28,15 @@
     const apiURL = `/api/employee/check-promotion/regular/list`;
     try {
       const res = await fetch(apiURL);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      // if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+
+      const contentType = res.headers.get('content-type') ?? '';
+      if (!res.ok || !contentType.includes('application/json')) {
+        const text = await res.text();
+        console.error("Unexpected response:", text.slice(0, 100));
+        throw new Error(`Unexpected response: ${res.status}`);
+      }
+
       const json = (await res.json()) as ApiResponseSuccess | ApiResponseError;
       if (json.status !== 200) {
         const errJson = json as ApiResponseError;

@@ -371,10 +371,20 @@
               body: uploadFormData, 
             });
 
-            if (!res.ok) {
+            const contentType = res.headers.get('content-type') ?? '';
+            if (!res.ok || !contentType.includes('application/json')) {
               allSuccess = false; 
+              const text = await res.text();
+              console.error("Unexpected response:", text.slice(0, 100));
               console.error(`Upload failed for document ${key}. Status: ${res.status}`);
-            } else {
+              throw new Error(`Unexpected response: ${res.status}`);
+            }
+            // if (!res.ok) {
+            //   allSuccess = false; 
+            //  console.error(`Upload failed for document ${key}. Status: ${res.status}`);
+              
+            // }
+            else {
               if (["skp-1", "skp-2"].includes(key)) {
                 const json = await res.json();
                 const docId = json.data.last_inserted_id as number;
@@ -456,7 +466,13 @@
 
     try {
       const res = await fetch(apiURL);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      // if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      const contentType = res.headers.get('content-type') ?? '';
+      if (!res.ok || !contentType.includes('application/json')) {
+        const text = await res.text();
+        console.error("Unexpected response:", text.slice(0, 100));
+        throw new Error(`Unexpected response: ${res.status}`);
+      }
       const json = (await res.json()) as ApiPerformanceDetailListResponseSuccess | ApiListResponseError;
       if (json.status !== 200) {
         const errJson = json as ApiListResponseError;
