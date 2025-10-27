@@ -3,6 +3,7 @@
   import { Button, Input, Label, Modal, Radio, Select } from 'flowbite-svelte';
   import type { OrganizationalUnit, UserModalProps } from './types';
   import type { Rank, WorkUnit } from '$lib/types'
+    import { hostPort } from "./variables";
 
   const dispatch = createEventDispatcher();
 
@@ -140,7 +141,7 @@
   let error = $state<string | null>(null);
 
   async function fetchRankList(): Promise<void> {
-    const apiURL = `http://localhost:9091/api/employee/ranks`;
+    const apiURL = `${hostPort}/api/employee/ranks`;
     try {
       const res = await fetch(apiURL);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
@@ -161,7 +162,7 @@
   }
 
   async function fetchOrgUnit(): Promise<void> {
-    const apiURL = `http://localhost:9091/api/unit/organizational-units`;
+    const apiURL = `${hostPort}/api/unit/organizational-units`;
     try {
       const res = await fetch(apiURL);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);

@@ -2,6 +2,7 @@
   import { Fileupload, Button } from 'flowbite-svelte';
   import type {SignedURL} from '$lib/types';
   import { createEventDispatcher } from 'svelte';
+    import { hostPort } from './variables';
 
   const dispatch = createEventDispatcher();
 
@@ -17,7 +18,7 @@
     if (!rawUrl) return;
 
     try {
-      const res = await fetch(`http://localhost:9091/api/thirdparty/sign-url`, {
+      const res = await fetch(`${hostPort}/api/thirdparty/sign-url`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

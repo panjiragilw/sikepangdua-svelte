@@ -14,3 +14,7 @@ export const avatarPath = (src: string): string => imgDir + '/users/' + src;
  * @returns The full path to the image
  */
 export const imagesPath = (src: string, ...subdirs: string[]): string => [imgDir, ...subdirs, src].filter(Boolean).join('/');
+
+export const host: string = 'localhost';
+export const port: string = ':9091';
+export const hostPort: string = `http://${host}${port}`

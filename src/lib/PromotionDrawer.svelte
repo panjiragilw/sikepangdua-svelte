@@ -6,6 +6,7 @@
   import type { Attachment } from 'svelte/attachments';
   import type { Rank } from '$lib/types'
   import PrefilledFileUploadLocal from './PrefilledFileUploadLocal.svelte';
+    import { hostPort } from './variables';
 
   let { open = $bindable(false), title = 'Promoted Employee', data = {}, documents = [], prefilledUrls = $bindable({}), additionalFields = [], ...formAttrs }: DocumentPoolDrawerProps = $props();
 
@@ -112,7 +113,7 @@
   }
         
   async function fetchRankList(): Promise<void> {
-    const apiURL = `http://localhost:9091/api/employee/ranks`;
+    const apiURL = `${hostPort}/api/employee/ranks`;
     try {
       const res = await fetch(apiURL);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);

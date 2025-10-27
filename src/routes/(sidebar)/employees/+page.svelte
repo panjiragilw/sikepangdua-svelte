@@ -6,7 +6,7 @@
   import { CogSolid, DotsVerticalOutline, DownloadSolid } from 'flowbite-svelte-icons';
   import { EditOutline, ExclamationCircleSolid, PlusOutline, TrashBinSolid } from 'flowbite-svelte-icons';
   // import Users from '../../../data/users.json';
-  import { imagesPath, DeleteModal, UserModal } from '$lib';
+  import { imagesPath, DeleteModal, UserModal, hostPort } from '$lib';
   import MetaTag from '../../utils/MetaTag.svelte';
   import type {API_Pagination, Employee} from '$lib/types'
   import EmployeeModal from "$lib/EmployeeModal.svelte";
@@ -48,7 +48,7 @@
   async function fetchEmployeeList(
     req: FetchParams
   ): Promise<void> {
-    let apiURL = "http://localhost:9091/api/employee/list";
+    let apiURL = `${hostPort}/api/employee/list`;
     let urlQuery: string = ""
     let page = req.page ?? 1
     let limit = req.pageSize ?? 10
@@ -187,7 +187,7 @@
     // Hit API add employee
     try {
       const jsonPayloadStr = JSON.stringify(jsonPayload);
-      const res = await fetch('http://localhost:9091/api/employee/', {
+      const res = await fetch(`${hostPort}/api/employee/`, {
         method: 'POST',
         body: jsonPayloadStr, 
         headers: {
@@ -244,7 +244,7 @@
     // Hit API add employee
     try {
       const jsonPayloadStr = JSON.stringify(jsonPayload);
-      const res = await fetch(`http://localhost:9091/api/employee/${payload.id}`, {
+      const res = await fetch(`${hostPort}/api/employee/${payload.id}`, {
         method: 'PUT',
         body: jsonPayloadStr, 
         headers: {
@@ -273,7 +273,7 @@
     if (e.detail === true) {
       console.log("id: ", current_employee.id);
       try {
-        const res = await fetch(`http://localhost:9091/api/employee/${current_employee.id}`, {
+        const res = await fetch(`${hostPort}/api/employee/${current_employee.id}`, {
           method: 'DELETE',
         });
 
@@ -350,7 +350,7 @@
         <TableBodyRow class="text-base">
           <TableBodyCell class="w-4 p-4"><Checkbox /></TableBodyCell>
           <TableBodyCell class="w-60 mr-12 flex items-center space-x-6 p-4 whitespace-nowrap">
-            <Avatar src={imagesPath('', 'users')} />
+            <!-- <Avatar src={imagesPath('', 'users')} /> -->
             <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
               <div class="text-base font-semibold text-gray-900 dark:text-white w-60 max-w-xs whitespace-normal break-words">{employee.name}</div>
               <div class="text-sm font-normal text-gray-500 dark:text-gray-300">{employee.ein}</div>

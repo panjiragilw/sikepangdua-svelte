@@ -3,7 +3,7 @@
   import trafficOptions from '../graphs/traffic';
   import { DesktopPcOutline, MobilePhoneOutline } from 'flowbite-svelte-icons';
   import { Chart } from '@flowbite-svelte-plugins/chart';
-  import { ChartWidget, Stats, Traffic, getChartOptions } from '$lib';
+  import { ChartWidget, Stats, Traffic, getChartOptions, hostPort } from '$lib';
   import type { DeviceOption, API_Pagination, RegularPromotionCheckResult, TrafficData, PromotionWithCategory } from '$lib/types';
 
   type Sort = { sort_by: string; order_by: "asc" | "desc" };
@@ -25,7 +25,7 @@
     // if (newPageSize !== undefined) pageSize = newPageSize;
     // loading = true;
     // error = null;
-    const apiURL = `http://localhost:9091/api/employee/check-promotion/regular/list`;
+    const apiURL = `${hostPort}/api/employee/check-promotion/regular/list`;
     try {
       const res = await fetch(apiURL);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
