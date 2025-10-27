@@ -285,7 +285,7 @@
       if (performanceDetailId > 0) {
         //  console.log("update pd: ", jsonPayload);
         // update performance detail
-        const res = await fetch(`/api/employee/detail/performance/${performanceDetailId}`, {
+        const res = await fetch(`${location.origin}/api/employee/detail/performance/${performanceDetailId}`, {
           method: 'PUT',
           body: JSON.stringify(jsonPayload), 
           headers: {
@@ -299,7 +299,7 @@
       } else {
         // insert performance detail
         // console.log("insert pd: ", jsonPayload);
-        const res = await fetch(`/api/employee/detail/performance`, {
+        const res = await fetch(`${location.origin}/api/employee/detail/performance`, {
           method: 'POST',
           body: JSON.stringify(jsonPayload), 
           headers: {
@@ -347,7 +347,7 @@
 
           if (isExistingDoc) {
             // console.log(`update for: ${key} `, isExistingDoc)
-            const res = await fetch(`/api/employee/document/${fetchExistingDocumentID(key, documents)}`, {
+            const res = await fetch(`${location.origin}/api/employee/document/${fetchExistingDocumentID(key, documents)}`, {
               method: 'PUT',
               body: uploadFormData, 
             });
@@ -366,7 +366,7 @@
             } 
           } else {
             // console.log(`insert for: ${key} `, isExistingDoc)
-            const res = await fetch('/api/employee/document', {
+            const res = await fetch('${location.origin}/api/employee/document', {
               method: 'POST',
               body: uploadFormData, 
             });
@@ -453,7 +453,7 @@
   ): Promise<void> {
     const employeeId = data.id as number; 
 
-    let apiURL = `/api/employee/detail/performance/list`;
+    let apiURL = `${location.origin}/api/employee/detail/performance/list`;
     let urlQuery: string = ""
 
     if (employeeId && employeeId > 0) {

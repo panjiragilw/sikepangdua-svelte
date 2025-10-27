@@ -18,7 +18,7 @@
     if (!rawUrl) return;
 
     try {
-      const res = await fetch(`/api/thirdparty/sign-url`, {
+      const res = await fetch(`${location.origin}/api/thirdparty/sign-url`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -5,7 +5,7 @@ const json = (r: Response) => r.json();
 
 export const load: LayoutServerLoad = async ({ fetch }) => {
   try {
-    const posts = await fetch('/api/posts').then(json);
+    const posts = await fetch(`${location.origin}/api/posts`).then(json);
     // console.log('posts: ', posts);
     return { 
       // ANALYTICS_ID, 
