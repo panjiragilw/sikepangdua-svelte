@@ -32,7 +32,7 @@
   async function fetchPromotionList(
     name?: string
   ): Promise<void> {
-    let apiURL = `${hostPort}/api/employee/check-promotion/regular/list`;
+    let apiURL = `/api/employee/check-promotion/regular/list`;
     let urlQuery: string = ""
     
     if (name && name != "") {
@@ -147,7 +147,7 @@
     // openDocument = true;
 
     try {
-      const res = await fetch(`${hostPort}/api/employee/documents/legal?ein=${ein}`);
+      const res = await fetch(`/api/employee/documents/legal?ein=${ein}`);
       if (!res.ok) throw new Error(`Failed to fetch documents`);
       const json = await res.json();
       legalDocs = []; // reset first
@@ -201,7 +201,7 @@
         uploadFormData.append('document_file', promotedFile);
 
         // 4. Execute the single API call
-        const res = await fetch('${hostPort}/api/employee/promoted', {
+        const res = await fetch('/api/employee/promoted', {
             method: 'POST',
             body: uploadFormData, 
         });
@@ -251,7 +251,7 @@
     try {
       const jsonPayloadStr = JSON.stringify(jsonPayload);
       // console.log("jsonPayloadStr: ", jsonPayloadStr);
-      const res = await fetch(`${hostPort}/api/employee/${payload.id}`, {
+      const res = await fetch(`/api/employee/${payload.id}`, {
         method: 'PUT',
         body: jsonPayloadStr, 
         headers: {

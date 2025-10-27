@@ -113,7 +113,7 @@
   }
         
   async function fetchRankList(): Promise<void> {
-    const apiURL = `${hostPort}/api/employee/ranks`;
+    const apiURL = `/api/employee/ranks`;
     try {
       const res = await fetch(apiURL);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);

@@ -17,4 +17,4 @@ export const imagesPath = (src: string, ...subdirs: string[]): string => [imgDir
 
 export const host: string = 'localhost';
 export const port: string = ':9091';
-export const hostPort: string = `http://${host}${port}`
+export const hostPort: string = ``

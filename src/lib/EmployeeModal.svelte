@@ -141,7 +141,7 @@
   let error = $state<string | null>(null);
 
   async function fetchRankList(): Promise<void> {
-    const apiURL = `${hostPort}/api/employee/ranks`;
+    const apiURL = `/api/employee/ranks`;
     try {
       const res = await fetch(apiURL);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
@@ -162,7 +162,7 @@
   }
 
   async function fetchOrgUnit(): Promise<void> {
-    const apiURL = `${hostPort}/api/unit/organizational-units`;
+    const apiURL = `/api/unit/organizational-units`;
     try {
       const res = await fetch(apiURL);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
