@@ -17,7 +17,7 @@
     if (!rawUrl) return;
 
     try {
-      const res = await fetch(`http://localhost:9091/api/thirdparty/sign-url`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/thirdparty/sign-url`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

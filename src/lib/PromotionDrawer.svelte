@@ -112,7 +112,7 @@
   }
         
   async function fetchRankList(): Promise<void> {
-    const apiURL = `http://localhost:9091/api/employee/ranks`;
+    const apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/employee/ranks`;
     try {
       const res = await fetch(apiURL);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);

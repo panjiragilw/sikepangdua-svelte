@@ -25,7 +25,7 @@
     // if (newPageSize !== undefined) pageSize = newPageSize;
     // loading = true;
     // error = null;
-    const apiURL = `http://localhost:9091/api/employee/check-promotion/regular/list`;
+    const apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/employee/check-promotion/regular/list`;
     try {
       const res = await fetch(apiURL);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);

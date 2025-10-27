@@ -48,7 +48,7 @@
   async function fetchEmployeeList(
     req: FetchParams
   ): Promise<void> {
-    let apiURL = "http://localhost:9091/api/employee/list";
+    let apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/employee/list`;
     let urlQuery: string = ""
     let page = req.page ?? 1
     let limit = req.pageSize ?? 10
@@ -187,7 +187,7 @@
     // Hit API add employee
     try {
       const jsonPayloadStr = JSON.stringify(jsonPayload);
-      const res = await fetch('http://localhost:9091/api/employee/', {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/`, {
         method: 'POST',
         body: jsonPayloadStr, 
         headers: {
@@ -244,7 +244,7 @@
     // Hit API add employee
     try {
       const jsonPayloadStr = JSON.stringify(jsonPayload);
-      const res = await fetch(`http://localhost:9091/api/employee/${payload.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/${payload.id}`, {
         method: 'PUT',
         body: jsonPayloadStr, 
         headers: {
@@ -273,7 +273,7 @@
     if (e.detail === true) {
       console.log("id: ", current_employee.id);
       try {
-        const res = await fetch(`http://localhost:9091/api/employee/${current_employee.id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/${current_employee.id}`, {
           method: 'DELETE',
         });
 
