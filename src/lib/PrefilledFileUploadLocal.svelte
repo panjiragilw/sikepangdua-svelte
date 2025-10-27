@@ -26,7 +26,7 @@
         body: JSON.stringify({ url: rawUrl }),
       });
       const contentType = res.headers.get('content-type') ?? '';
-      if (!res.ok || !contentType.includes('application/json')) {
+      if (!res.ok || !contentType || !contentType.includes('application/json')) {
         const text = await res.text();
         console.error("Unexpected response:", text.slice(0, 100));
         throw new Error(`Unexpected response: ${res.status}`);

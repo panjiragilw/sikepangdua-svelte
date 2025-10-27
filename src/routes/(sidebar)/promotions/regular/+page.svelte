@@ -46,7 +46,7 @@
       const res = await fetch(apiURL);
       // if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       const contentType = res.headers.get('content-type') ?? '';
-      if (!res.ok || !contentType.includes('application/json')) {
+      if (!res.ok || !contentType || !contentType.includes('application/json')) {
         const text = await res.text();
         console.error("Unexpected response:", text.slice(0, 100));
         throw new Error(`Unexpected response: ${res.status}`);
@@ -156,7 +156,7 @@
       const res = await fetch(`${location.origin}/api/employee/documents/legal?ein=${ein}`);
       // if (!res.ok) throw new Error(`Failed to fetch documents`);
       const contentType = res.headers.get('content-type') ?? '';
-      if (!res.ok || !contentType.includes('application/json')) {
+      if (!res.ok || !contentType || !contentType.includes('application/json')) {
         const text = await res.text();
         console.error("Unexpected response:", text.slice(0, 100));
         throw new Error(`Unexpected response: ${res.status}`);
