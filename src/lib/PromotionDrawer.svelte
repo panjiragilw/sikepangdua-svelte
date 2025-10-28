@@ -6,6 +6,7 @@
   import type { Attachment } from 'svelte/attachments';
   import type { Rank } from '$lib/types'
   import PrefilledFileUploadLocal from './PrefilledFileUploadLocal.svelte';
+    import { getApiBaseUrl } from './api';
 
   let { open = $bindable(false), title = 'Promoted Employee', data = {}, documents = [], prefilledUrls = $bindable({}), additionalFields = [], ...formAttrs }: DocumentPoolDrawerProps = $props();
 
@@ -113,7 +114,7 @@
         
   async function fetchRankList(): Promise<void> {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const apiBase = getApiBaseUrl();
       console.log(apiBase);
 
       const res = await fetch(`${apiBase}/api/employee/ranks`);

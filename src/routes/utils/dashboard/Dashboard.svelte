@@ -5,6 +5,7 @@
   import { Chart } from '@flowbite-svelte-plugins/chart';
   import { ChartWidget, Stats, Traffic, getChartOptions } from '$lib';
   import type { DeviceOption, API_Pagination, RegularPromotionCheckResult, TrafficData, PromotionWithCategory } from '$lib/types';
+    import { getApiBaseUrl } from "$lib/api";
 
   type Sort = { sort_by: string; order_by: "asc" | "desc" };
   type Meta = { pagination: API_Pagination; sort: Sort };
@@ -27,7 +28,7 @@
     // error = null;
     // const apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/employee/check-promotion/regular/list`;
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const apiBase = getApiBaseUrl();
       console.log(apiBase);
 
       const res = await fetch(`${apiBase}/api/employee/check-promotion/regular/list`);

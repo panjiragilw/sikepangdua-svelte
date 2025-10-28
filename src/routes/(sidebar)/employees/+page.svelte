@@ -11,6 +11,7 @@
   import type {API_Pagination, Employee} from '$lib/types'
   import EmployeeModal from "$lib/EmployeeModal.svelte";
   import PaginationComponent from "$lib/Pagination.svelte";
+    import { getApiBaseUrl } from "$lib/api";
     // import type { page } from "$app/state";
 
   let openEmployee: boolean = $state(false); // modal control
@@ -49,7 +50,7 @@
     req: FetchParams
   ): Promise<void> {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const apiBase = getApiBaseUrl();
       console.log(apiBase); 
 
       let apiURL = `${apiBase}/api/employee/list`;

@@ -2,6 +2,7 @@
   import { Fileupload, Button } from 'flowbite-svelte';
   import type {SignedURL} from '$lib/types';
   import { createEventDispatcher } from 'svelte';
+    import { getApiBaseUrl } from './api';
 
   const dispatch = createEventDispatcher();
 
@@ -17,7 +18,7 @@
     if (!rawUrl) return;
 
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const apiBase = getApiBaseUrl();
       console.log(apiBase);
 
       const res = await fetch(`${apiBase}/api/thirdparty/sign-url`, {

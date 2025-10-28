@@ -4,6 +4,7 @@
   import type { OrganizationalUnit, UserModalProps } from './types';
   import type { Rank, WorkUnit } from '$lib/types'
     import { rsl } from "../routes/utils/highlight/languages";
+    import { getApiBaseUrl } from "./api";
 
   const dispatch = createEventDispatcher();
 
@@ -142,7 +143,7 @@
 
   async function fetchRankList(): Promise<void> {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const apiBase = getApiBaseUrl();
       console.log(apiBase);
 
       const res = await fetch(`${apiBase}/api/employee/ranks`);
@@ -174,7 +175,7 @@
 
   async function fetchOrgUnit(): Promise<void> {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const apiBase = getApiBaseUrl();
       console.log(apiBase);  
       
       const res = await fetch(`${apiBase}/api/unit/organizational-units`);

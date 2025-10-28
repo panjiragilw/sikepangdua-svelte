@@ -6,6 +6,7 @@
   import MetaTag from '../../../utils/MetaTag.svelte';
   import { DeleteDrawer, DocumentPoolDrawer, PromotionDrawer } from '$lib';
   import type {API_Pagination, RegularPromotionCheckResult, LegalDocument, PromotionWithCategory} from '$lib/types'
+    import { getApiBaseUrl } from "$lib/api";
 
   let openDocument: boolean = $state(false);
   let openPromoted: boolean = $state(false); // modal control
@@ -33,7 +34,7 @@
     name?: string
   ): Promise<void> {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const apiBase = getApiBaseUrl();
       console.log(apiBase);
 
       let apiURL = `${apiBase}/api/employee/check-promotion/regular/list`;
@@ -157,7 +158,7 @@
     // openDocument = true;
 
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const apiBase = getApiBaseUrl();
       console.log(apiBase); 
       
       const res = await fetch(`${apiBase}/api/employee/documents/legal?ein=${ein}`);

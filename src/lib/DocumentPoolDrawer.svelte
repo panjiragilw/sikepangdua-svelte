@@ -6,6 +6,7 @@
   import type { Attachment } from 'svelte/attachments';
   import PrefilledFileUploadLocal from './PrefilledFileUploadLocal.svelte';
     import { json } from '@sveltejs/kit';
+    import { getApiBaseUrl } from './api';
 
   const dispatch = createEventDispatcher<{ refresh: void, close: void }>();
 
@@ -344,7 +345,7 @@
           const isExistingDoc = existingDocKeys.includes(key);
           // console.log("exist: ", key, isExistingDoc)
 
-          const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+          const apiBase = getApiBaseUrl();
           console.log(apiBase);
           if (isExistingDoc) {
             // console.log(`update for: ${key} `, isExistingDoc)
@@ -467,7 +468,7 @@
     const employeeId = data.id as number; 
 
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const apiBase = getApiBaseUrl();
       console.log(apiBase);  
 
       let apiURL = `${apiBase}/api/employee/detail/performance/list`;
