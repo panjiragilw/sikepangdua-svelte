@@ -9,7 +9,7 @@
   }
 
   let { children, data }: LayoutProps = $props();
-  const routes: Route[] = data.posts.adminDashboard;
+  const routes: Route[] = data?.posts?.adminDashboard ?? [];
   const docsRoute = routes.filter((route) => route.path !== '').map((route) => route.path);
 
   let drawerHidden = $state(false);
