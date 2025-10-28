@@ -33,7 +33,7 @@
     name?: string
   ): Promise<void> {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
       console.log(apiBase);
 
       let apiURL = `${apiBase}/api/employee/check-promotion/regular/list`;
@@ -157,7 +157,7 @@
     // openDocument = true;
 
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
       console.log(apiBase); 
       
       const res = await fetch(`${apiBase}/api/employee/documents/legal?ein=${ein}`);

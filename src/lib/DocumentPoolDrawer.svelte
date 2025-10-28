@@ -344,7 +344,7 @@
           const isExistingDoc = existingDocKeys.includes(key);
           // console.log("exist: ", key, isExistingDoc)
 
-          const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+          const apiBase = import.meta.env.VITE_API_BASE_URL || '';
           console.log(apiBase);
           if (isExistingDoc) {
             // console.log(`update for: ${key} `, isExistingDoc)
@@ -467,7 +467,7 @@
     const employeeId = data.id as number; 
 
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
       console.log(apiBase);  
 
       let apiURL = `${apiBase}/api/employee/detail/performance/list`;

@@ -142,7 +142,7 @@
 
   async function fetchRankList(): Promise<void> {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
       console.log(apiBase);
 
       const res = await fetch(`${apiBase}/api/employee/ranks`);
@@ -174,7 +174,7 @@
 
   async function fetchOrgUnit(): Promise<void> {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
       console.log(apiBase);  
       
       const res = await fetch(`${apiBase}/api/unit/organizational-units`);

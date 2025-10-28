@@ -49,7 +49,7 @@
     req: FetchParams
   ): Promise<void> {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
       console.log(apiBase); 
 
       let apiURL = `${apiBase}/api/employee/list`;

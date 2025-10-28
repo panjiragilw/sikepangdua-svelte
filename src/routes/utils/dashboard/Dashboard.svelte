@@ -27,7 +27,7 @@
     // error = null;
     // const apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/employee/check-promotion/regular/list`;
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
       console.log(apiBase);
 
       const res = await fetch(`${apiBase}/api/employee/check-promotion/regular/list`);
