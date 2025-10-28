@@ -226,8 +226,10 @@
         // Append the actual file
         uploadFormData.append('document_file', promotedFile);
 
+        const apiBase = getApiBaseUrl();
+        console.log(apiBase);
         // 4. Execute the single API call
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/promoted`, {
+        const res = await fetch(`${apiBase}/api/employee/promoted`, {
             method: 'POST',
             body: uploadFormData, 
         });
@@ -275,9 +277,11 @@
 
     // Hit API update employee
     try {
+      const apiBase = getApiBaseUrl();
+      console.log(apiBase);
       const jsonPayloadStr = JSON.stringify(jsonPayload);
       // console.log("jsonPayloadStr: ", jsonPayloadStr);
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/${payload.id}`, {
+      const res = await fetch(`${apiBase}/api/employee/${payload.id}`, {
         method: 'PUT',
         body: jsonPayloadStr, 
         headers: {
@@ -288,6 +292,7 @@
       // Cek status HTTP. Di sini diasumsikan status 2xx adalah sukses
       if (!res.ok) {
         console.error(`Edit failed. Status: ${res.status}`, jsonPayload);
+        throw new Error(`Invalid response: ${res.status}`);
       } 
       // Tutup modal setelah sukses
       // openEmployee = false;

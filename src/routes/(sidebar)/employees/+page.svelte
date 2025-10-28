@@ -200,8 +200,11 @@
 
     // Hit API add employee
     try {
+      const apiBase = getApiBaseUrl();
+      console.log(apiBase);
+
       const jsonPayloadStr = JSON.stringify(jsonPayload);
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/`, {
+      const res = await fetch(`${apiBase}/api/employee/`, {
         method: 'POST',
         body: jsonPayloadStr, 
         headers: {
@@ -212,6 +215,7 @@
       // Cek status HTTP. Di sini diasumsikan status 2xx adalah sukses
       if (!res.ok) {
         console.error(`Add failed. Status: ${res.status}`, jsonPayload);
+        throw new Error(`Invalid response: ${res.status}`);
       } 
       // Tutup modal setelah sukses
       openEmployee = false;
@@ -257,8 +261,11 @@
 
     // Hit API add employee
     try {
+      const apiBase = getApiBaseUrl();
+      console.log(apiBase);
+
       const jsonPayloadStr = JSON.stringify(jsonPayload);
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/${payload.id}`, {
+      const res = await fetch(`${apiBase}/api/employee/${payload.id}`, {
         method: 'PUT',
         body: jsonPayloadStr, 
         headers: {
@@ -269,6 +276,7 @@
       // Cek status HTTP. Di sini diasumsikan status 2xx adalah sukses
       if (!res.ok) {
         console.error(`Edit failed. Status: ${res.status}`, jsonPayload);
+        throw new Error(`Invalid response: ${res.status}`);
       } 
       // Tutup modal setelah sukses
       openEmployee = false;
@@ -284,16 +292,19 @@
     e.preventDefault();
     // console.log(e.detail);
 
+    const apiBase = getApiBaseUrl();
+    console.log(apiBase);
     if (e.detail === true) {
       console.log("id: ", current_employee.id);
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/${current_employee.id}`, {
+        const res = await fetch(`${apiBase}/api/employee/${current_employee.id}`, {
           method: 'DELETE',
         });
 
         // Cek status HTTP. Di sini diasumsikan status 2xx adalah sukses
         if (!res.ok) {
           console.error(`Delete failed. Status: ${res.status}`);
+          throw new Error(`Invalid response: ${res.status}`);
         } 
         // Tutup modal setelah sukses
         openEmployee = false;

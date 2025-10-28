@@ -282,34 +282,48 @@
 
     // console.log("jsonPayload: ", jsonPayload, performanceDetailId);
     if (json.length > 1) {
+      const apiBase = getApiBaseUrl();
+      console.log(apiBase);
       if (performanceDetailId > 0) {
         //  console.log("update pd: ", jsonPayload);
         // update performance detail
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/detail/performance/${performanceDetailId}`, {
-          method: 'PUT',
-          body: JSON.stringify(jsonPayload), 
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!res.ok) {
-          console.error(`Failed when update performance detail for ${docKey}. Status: ${res.status}`);
-        } 
+        try {
+          const res = await fetch(`${apiBase}/api/employee/detail/performance/${performanceDetailId}`, {
+            method: 'PUT',
+            body: JSON.stringify(jsonPayload), 
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+  
+          if (!res.ok ) {
+            console.error(`Failed when update performance detail for ${docKey}. Status: ${res.status}`);
+            throw new Error(`Invalid response: ${res.status}`);
+          } 
+        } catch (error) {
+          console.error(`Network error during update detail performance`);
+          // break;
+        }
       } else {
         // insert performance detail
         // console.log("insert pd: ", jsonPayload);
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/detail/performance`, {
-          method: 'POST',
-          body: JSON.stringify(jsonPayload), 
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        try {
+          const res = await fetch(`${apiBase}/api/employee/detail/performance`, {
+            method: 'POST',
+            body: JSON.stringify(jsonPayload), 
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
 
-        if (!res.ok) {
-          console.error(`Failed when insert performance detail for ${docKey}. Status: ${res.status}`);
-        } 
+          if (!res.ok) {
+            console.error(`Failed when insert performance detail for ${docKey}. Status: ${res.status}`);
+            throw new Error(`Invalid response: ${res.status}`);
+          } 
+        } catch (error) {
+          console.error(`Network error during update detail performance`);
+          // break;
+        }
       }
     }
 
