@@ -344,54 +344,78 @@
           const isExistingDoc = existingDocKeys.includes(key);
           // console.log("exist: ", key, isExistingDoc)
 
+          const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+          console.log(apiBase);
           if (isExistingDoc) {
             // console.log(`update for: ${key} `, isExistingDoc)
-            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/document/${fetchExistingDocumentID(key, documents)}`, {
+            const res = await fetch(`${apiBase}/api/employee/document/${fetchExistingDocumentID(key, documents)}`, {
               method: 'PUT',
               body: uploadFormData, 
             });
+            console.log(res);
 
-            if (!res.ok) {
+            const contentType = res.headers.get('content-type') ?? '';
+            const text = await res.text();
+
+            if (!res.ok || !contentType.includes('application/json')) {
               allSuccess = false; 
               console.error(`Upload failed for document ${key}. Status: ${res.status}`);
-            } else {
-              if (["skp-1", "skp-2"].includes(key)) {
-               
-                console.log("process skp: ", key, skpData)
-                if ((key === "skp-1" && skpData[0].docId > 0) || (key === "skp-2" && skpData[1].docId > 0)) {
-                  insertUpdatePerformanceDetail(key, Number(employeeId))
-                }
-              }
+              throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
             } 
+
+            const json = JSON.parse(text);
+            if (json.status !== 200) {
+              const errJson = json;
+              throw new Error(errJson);
+            }
+            
+            if (["skp-1", "skp-2"].includes(key)) {
+              console.log("process skp: ", key, skpData)
+              if ((key === "skp-1" && skpData[0].docId > 0) || (key === "skp-2" && skpData[1].docId > 0)) {
+                insertUpdatePerformanceDetail(key, Number(employeeId))
+              }
+            }
+            
           } else {
             // console.log(`insert for: ${key} `, isExistingDoc)
-            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/document`, {
+            const res = await fetch(`${apiBase}/api/employee/document`, {
               method: 'POST',
               body: uploadFormData, 
             });
+            console.log(res);
+            
+            const contentType = res.headers.get('content-type') ?? '';
+            const text = await res.text();
 
-            if (!res.ok) {
+            if (!res.ok || !contentType.includes('application/json')) {
               allSuccess = false; 
               console.error(`Upload failed for document ${key}. Status: ${res.status}`);
-            } else {
-              if (["skp-1", "skp-2"].includes(key)) {
-                const json = await res.json();
-                const docId = json.data.last_inserted_id as number;
-
-                // console.log("docID: ", docId.last_inserted_id);
-
-                 switch (key) {
-                  case "skp-1":
-                    skpData[0].docId = docId;
-                  case "skp-2":
-                    skpData[1].docId = docId;
-                }
-                // console.log("process skp: ", key, skpData)
-                if ((key === "skp-1" && skpData[0].docId > 0) || (key === "skp-2" && skpData[1].docId > 0)) {
-                  insertUpdatePerformanceDetail(key, Number(employeeId))
-                }
-              }
+              throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
             } 
+            
+            const json = JSON.parse(text);
+            if (json.status !== 200) {
+              const errJson = json;
+              throw new Error(errJson);
+            }
+
+            if (["skp-1", "skp-2"].includes(key)) {
+              // const json = await res.json();
+              const docId = json.data.last_inserted_id as number;
+
+              // console.log("docID: ", docId.last_inserted_id);
+
+                switch (key) {
+                case "skp-1":
+                  skpData[0].docId = docId;
+                case "skp-2":
+                  skpData[1].docId = docId;
+              }
+              // console.log("process skp: ", key, skpData)
+              if ((key === "skp-1" && skpData[0].docId > 0) || (key === "skp-2" && skpData[1].docId > 0)) {
+                insertUpdatePerformanceDetail(key, Number(employeeId))
+              }
+            }
           }
         } catch (error) {
           allSuccess = false;
@@ -442,21 +466,32 @@
   ): Promise<void> {
     const employeeId = data.id as number; 
 
-    let apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/employee/detail/performance/list`;
-    let urlQuery: string = ""
-
-    if (employeeId && employeeId > 0) {
-       urlQuery += `employee_id=${employeeId}`;
-    }
-
-    if (urlQuery != "") {
-      apiURL += `?${urlQuery}`
-    }
-
     try {
+      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      console.log(apiBase);  
+
+      let apiURL = `${apiBase}/api/employee/detail/performance/list`;
+      let urlQuery: string = ""
+
+      if (employeeId && employeeId > 0) {
+        urlQuery += `employee_id=${employeeId}`;
+      }
+
+      if (urlQuery != "") {
+        apiURL += `?${urlQuery}`
+      }
+
       const res = await fetch(apiURL);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      const json = (await res.json()) as ApiPerformanceDetailListResponseSuccess | ApiListResponseError;
+      console.log(res);
+
+      const contentType = res.headers.get('content-type') ?? '';
+      const text = await res.text();
+
+      if (!res.ok || !contentType.includes('application/json')) {
+        throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
+      } 
+
+      const json = JSON.parse(text) as ApiPerformanceDetailListResponseSuccess | ApiListResponseError;
       if (json.status !== 200) {
         const errJson = json as ApiListResponseError;
         throw new Error(errJson.error);

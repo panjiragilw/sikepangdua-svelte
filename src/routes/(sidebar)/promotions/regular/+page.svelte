@@ -32,20 +32,30 @@
   async function fetchPromotionList(
     name?: string
   ): Promise<void> {
-    let apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/employee/check-promotion/regular/list`;
-    let urlQuery: string = ""
-    
-    if (name && name != "") {
-      urlQuery += `&name=${name}`;
-    }
-    if (urlQuery != "") {
-      apiURL += `?${urlQuery}`
-    }
-
     try {
+      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      console.log(apiBase);
+
+      let apiURL = `${apiBase}/api/employee/check-promotion/regular/list`;
+      let urlQuery: string = ""
+      
+      if (name && name != "") {
+        urlQuery += `&name=${name}`;
+      }
+      if (urlQuery != "") {
+        apiURL += `?${urlQuery}`
+      }
       const res = await fetch(apiURL);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      const json = (await res.json()) as ApiPromotionListResponseSuccess | ApiPromotionListResponseError;
+      console.log(res);
+
+      const contentType = res.headers.get('content-type') ?? '';
+      const text = await res.text();
+
+      if (!res.ok || !contentType.includes('application/json')) {
+        throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
+      }
+
+      const json = JSON.parse(text) as ApiPromotionListResponseSuccess | ApiPromotionListResponseError;
       if (json.status !== 200) {
         const errJson = json as ApiPromotionListResponseError;
         throw new Error(errJson.error);
@@ -147,9 +157,24 @@
     // openDocument = true;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/employee/documents/legal?ein=${ein}`);
-      if (!res.ok) throw new Error(`Failed to fetch documents`);
-      const json = await res.json();
+      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      console.log(apiBase); 
+      
+      const res = await fetch(`${apiBase}/api/employee/documents/legal?ein=${ein}`);
+      console.log(res);
+
+      const contentType = res.headers.get('content-type') ?? '';
+      const text = await res.text();
+      
+      if (!res.ok || !contentType.includes('application/json')) {
+        throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
+      }   
+
+      const json = JSON.parse(text);
+      if (json.status !== 200) {
+        const errJson = json;
+        throw new Error(errJson);
+      }
       legalDocs = []; // reset first
       legalDocs = json.data as LegalDocument[]; // assign new array
     } catch (e) {

@@ -25,11 +25,22 @@
     // if (newPageSize !== undefined) pageSize = newPageSize;
     // loading = true;
     // error = null;
-    const apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/employee/check-promotion/regular/list`;
+    // const apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/employee/check-promotion/regular/list`;
     try {
-      const res = await fetch(apiURL);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      const json = (await res.json()) as ApiResponseSuccess | ApiResponseError;
+      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      console.log(apiBase);
+
+      const res = await fetch(`${apiBase}/api/employee/check-promotion/regular/list`);
+      console.log(res);
+
+      const contentType = res.headers.get('content-type') ?? '';
+      const text = await res.text();
+
+      if (!res.ok || !contentType.includes('application/json')) {
+        throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
+      }  
+      
+      const json = JSON.parse(text) as ApiResponseSuccess | ApiResponseError;
       if (json.status !== 200) {
         const errJson = json as ApiResponseError;
         throw new Error(errJson.error);
@@ -40,9 +51,7 @@
       // totalData = meta?.pagination?.total ?? 0;
       // totalPage = meta?.pagination?.pages ?? 0;
 
-      // console.log(promotions, meta);
-
-      
+      // console.log(promotions, meta);      
     } catch (e: any) {
       error = e.message;
       console.error("Error fetching programs:", e);

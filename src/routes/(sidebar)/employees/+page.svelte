@@ -48,31 +48,44 @@
   async function fetchEmployeeList(
     req: FetchParams
   ): Promise<void> {
-    let apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/employee/list`;
-    let urlQuery: string = ""
-    let page = req.page ?? 1
-    let limit = req.pageSize ?? 10
-
-    if (req.name && req.name != "") {
-      urlQuery += `&name=${req.name}`;
-      page = 0
-      limit = 0
-    }
-    if (page > 0){
-      urlQuery += `&page=${page}`;
-    }
-    if (limit > 0) {
-      urlQuery += `&limit=${limit}`;
-    }
-
-    if (urlQuery != "") {
-      apiURL += `?${urlQuery}`
-    }
-    
     try {
+      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      console.log(apiBase); 
+
+      let apiURL = `${apiBase}/api/employee/list`;
+      let urlQuery: string = ""
+
+      let page = req.page ?? 1
+      let limit = req.pageSize ?? 10
+
+      if (req.name && req.name != "") {
+        urlQuery += `&name=${req.name}`;
+        page = 0
+        limit = 0
+      }
+      if (page > 0){
+        urlQuery += `&page=${page}`;
+      }
+      if (limit > 0) {
+        urlQuery += `&limit=${limit}`;
+      }
+
+      if (urlQuery != "") {
+        apiURL += `?${urlQuery}`
+      }
+    
       const res = await fetch(apiURL);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      const json = (await res.json()) as ApiEmployeeListResponseSuccess | ApiEmployeeListResponseError;
+      console.log(res);
+
+      
+      const contentType = res.headers.get('content-type') ?? '';
+      const text = await res.text();
+
+      if (!res.ok || !contentType.includes('application/json')) {
+        throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
+      }
+
+      const json = JSON.parse(text) as ApiEmployeeListResponseSuccess | ApiEmployeeListResponseError;
       if (json.status !== 200) {
         const errJson = json as ApiEmployeeListResponseError;
         throw new Error(errJson.error);

@@ -3,6 +3,7 @@
   import { Button, Input, Label, Modal, Radio, Select } from 'flowbite-svelte';
   import type { OrganizationalUnit, UserModalProps } from './types';
   import type { Rank, WorkUnit } from '$lib/types'
+    import { rsl } from "../routes/utils/highlight/languages";
 
   const dispatch = createEventDispatcher();
 
@@ -140,11 +141,21 @@
   let error = $state<string | null>(null);
 
   async function fetchRankList(): Promise<void> {
-    const apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/employee/ranks`;
     try {
-      const res = await fetch(apiURL);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      const json = (await res.json()) as ApiRankListResponseSuccess | ApiListResponseError;
+      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      console.log(apiBase);
+
+      const res = await fetch(`${apiBase}/api/employee/ranks`);
+      console.log(res);
+      
+      const contentType = res.headers.get('content-type') ?? '';
+      const text = await res.text();
+
+      if (!res.ok || !contentType.includes('application/json')) {
+        throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
+      }       
+      
+      const json = JSON.parse(text) as ApiRankListResponseSuccess | ApiListResponseError;
       if (json.status !== 200) {
         const errJson = json as ApiListResponseError;
         throw new Error(errJson.error);
@@ -152,6 +163,7 @@
       const successResponse = json as ApiRankListResponseSuccess;
       ranks = successResponse.data;
     } catch (e: any) {
+      ranks = [];
       error = e.message;
     } finally {
       // console.log("ranks: ", ranks);
@@ -161,11 +173,21 @@
   }
 
   async function fetchOrgUnit(): Promise<void> {
-    const apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/unit/organizational-units`;
     try {
-      const res = await fetch(apiURL);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      const json = (await res.json()) as ApiOrganizationalUnitListResponseSuccess | ApiListResponseError;
+      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      console.log(apiBase);  
+      
+      const res = await fetch(`${apiBase}/api/unit/organizational-units`);
+      console.log(res);
+
+      const contentType = res.headers.get('content-type') ?? '';
+      const text = await res.text();
+      
+      if (!res.ok || !contentType.includes('application/json')) {
+        throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
+      }       
+
+      const json = JSON.parse(text) as ApiOrganizationalUnitListResponseSuccess | ApiListResponseError;
       if (json.status !== 200) {
         const errJson = json as ApiListResponseError;
         throw new Error(errJson.error);
@@ -173,6 +195,7 @@
       const successResponse = json as ApiOrganizationalUnitListResponseSuccess;
       orgUnits = successResponse.data;
     } catch (e: any) {
+      orgUnits = [];
       error = e.message;
     } finally {
       // console.log("org units: ", orgUnits);

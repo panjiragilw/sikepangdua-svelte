@@ -17,15 +17,31 @@
     if (!rawUrl) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/thirdparty/sign-url`, {
+      const apiBase = import.meta.env.VITE_API_BASE_URL != "" ? import.meta.env.VITE_API_BASE_URL : 'http://localhost:9091'
+      console.log(apiBase);
+
+      const res = await fetch(`${apiBase}/api/thirdparty/sign-url`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ url: rawUrl }),
       });
+      console.log(res);
+      
+      const contentType = res.headers.get('content-type') ?? '';
+      const text = await res.text();
 
-      const json = await res.json();
+      if (!res.ok || !contentType.includes('application/json')) {
+        throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
+      }
+
+      const json = JSON.parse(text);
+      if (json.status !== 200) {
+        const errJson = json;
+        throw new Error(errJson);
+      }
+
       const signedUrl = json?.data as SignedURL;
 
       if (signedUrl?.signed_url) {
