@@ -346,7 +346,7 @@
   </div>
   <Table class={tableLoading ? 'opacity-50' : ''}>
     <TableHead class="border-y border-gray-200 bg-gray-100 dark:border-gray-700">
-      <TableHeadCell class="w-4 p-4"><Checkbox /></TableHeadCell>
+      <TableHeadCell class="w-4 p-4"></TableHeadCell>
       {#each ['Employee Name', 'Rank', 'Group/Class', 'SDS Last Group', 'Expected Promotion Date', 'Eligibility', 'Action'] as title}
         <TableHeadCell class="ps-4 font-normal">{title}</TableHeadCell>
       {/each}
@@ -354,7 +354,7 @@
     <TableBody>
       {#each employeePromotions as promotion}
         <TableBodyRow class="text-base">
-          <TableBodyCell class="w-4 p-4"><Checkbox /></TableBodyCell>
+          <TableBodyCell class="w-4 p-4"></TableBodyCell>
           <TableBodyCell class="flex items-center space-x-6 p-4 whitespace-nowrap">
             <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
               <div class="text-base font-semibold text-gray-900 dark:text-white">

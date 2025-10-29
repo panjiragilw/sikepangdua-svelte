@@ -627,7 +627,7 @@
       {/if}
       <div class="flex justify-center space-x-4">
         <Button type="submit" class="w-full">Save</Button>
-        <Button color="alternative" class="w-full" onclick={() => {(open = false)}}>
+        <Button color="alternative" class="w-full dark:bg-gray-200 text-red-500 dark:text-red-500" onclick={() => {(open = false)}}>
           <CloseOutline />
           Cancel
         </Button>

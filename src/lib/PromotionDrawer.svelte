@@ -246,7 +246,7 @@
     </div>
 
     <!-- Tombol floating -->
-    <div class="sticky bottom-0 bg-white px-4 py-4 border-t z-10">
+    <div class="sticky bottom-0 left-0 px-4 py-4 border-t z-10 bg-white dark:bg-gray-800">
       {#if uploading}
        <div class="px-4 py-2 text-sm text-gray-500 italic text-center">
          Updating data, please wait...
@@ -256,7 +256,7 @@
         {#if (isEligible)}
           <Button type="submit" class="w-full" disabled={submitButtonDisabled}>Promoted</Button>
         {/if}
-        <Button color="alternative" class="w-full" onclick={() => {(open = false)}}>
+        <Button color="alternative" class="w-full dark:bg-gray-200 text-red-600 dark:text-red-600" onclick={() => {(open = false)}}>
           <CloseOutline />
           Cancel
         </Button>

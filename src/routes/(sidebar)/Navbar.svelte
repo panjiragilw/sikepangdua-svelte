@@ -38,7 +38,7 @@
     <!-- <NotificationList {notifications} /> -->
     <!-- <AppsMenu {menu} /> -->
     <DarkMode />
-    <UserMenu {...Users[4]} >
+    <UserMenu {...Users[0]} >
       <DropdownDivider />
       <DropdownItem>Sign out</DropdownItem>
     </UserMenu>

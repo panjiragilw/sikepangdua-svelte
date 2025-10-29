@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import trafficOptions from '../graphs/traffic';
-  import { DesktopPcOutline, MobilePhoneOutline } from 'flowbite-svelte-icons';
+  import { DesktopPcOutline, MobilePhoneOutline, ThumbsDownOutline, ThumbsUpOutline } from 'flowbite-svelte-icons';
   import { Chart } from '@flowbite-svelte-plugins/chart';
   import { ChartWidget, Stats, Traffic, getChartOptions } from '$lib';
   import type { DeviceOption, API_Pagination, RegularPromotionCheckResult, TrafficData, PromotionWithCategory } from '$lib/types';
@@ -108,14 +108,14 @@
       title: 'Eligible',
       subtitle: eligibleCount.toString(),
       IconOption: {
-        icon: DesktopPcOutline,
+        icon: ThumbsUpOutline,
       },
     },
     {
       title: 'Not Eligible',
       subtitle: notEligibleCount.toString(),
       IconOption: {
-        icon: MobilePhoneOutline,
+        icon: ThumbsDownOutline,
       },
     },
   ]);

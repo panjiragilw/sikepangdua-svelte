@@ -1,5 +1,15 @@
 [
   {
+    "id": 99,
+    "name": "John Doe",
+    "avatar": "neil-sims.png",
+    "email": "john.doe@tester.com",
+    "biography": "I love working with React and Flowbites to create efficient and user-friendly interfaces. In my spare time, I enjoys baking, hiking, and spending time with my family.",
+    "position": "UI/UX Engineer",
+    "country": "Australia",
+    "status": "Offline"
+  },
+  {
     "id": 1,
     "name": "Neil Sims",
     "avatar": "neil-sims.png",
@@ -199,4 +209,5 @@
     "country": "Russia",
     "status": "Active"
   }
+  
 ]
