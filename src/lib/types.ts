@@ -623,6 +623,7 @@ export type Employee = {
   ein: string;
   position: string;
   positon_type: string;
+  organizational_unit: string;
   work_unit: string;
   rank: string;
   group_class: string;

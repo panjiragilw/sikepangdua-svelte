@@ -7,7 +7,7 @@
 
 <div>
   {#if IconOption?.icon}
-    <IconOption.icon size={IconOption.size} />
+    <IconOption.icon class="dark:text-gray-300" size={IconOption.size} />
   {/if}
   <h3 class="text-gray-500 dark:text-gray-300">{title}</h3>
   <h4 class="text-xl font-bold dark:text-white">{subtitle}</h4>

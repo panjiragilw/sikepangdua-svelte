@@ -307,7 +307,7 @@
         <Select 
           name="org_unit_id" 
           bind:value={selectedOrgUnitId}
-          placeholder="Choose Organizational Unit" required
+          placeholder="Choose Organizational Unit"
           onchange={handleOrgUnitChange}
           >
           {#each orgUnits || [] as {id, name}}
@@ -323,7 +323,7 @@
         <Select 
           name="work_unit_id" 
           bind:value={selectedWorkUnitId}
-          placeholder="Choose Work Unit" required disabled={isWorkUnitDisabled}>
+          placeholder="Choose Work Unit" disabled={isWorkUnitDisabled}>
           {#each sOrgUnit?.work_units || [] as {id, name}}
             <option value={id}>
                 {name}

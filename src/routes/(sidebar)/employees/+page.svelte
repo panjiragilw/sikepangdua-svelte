@@ -232,7 +232,7 @@
   async function handleSaveEmployee(e: CustomEvent) {
     e.preventDefault();
     const payload = e.detail; // Ini adalah payload dari modal
-    // console.log("Receive event SAVE (EDIT) with payload:", payload);
+    console.log("Receive event SAVE (EDIT) with payload:", payload);
     
     const allowedKeysStr = [
       "name", 
@@ -245,6 +245,7 @@
     ];
     const allowedKeysNumber = [
       "work_unit_id",
+      "org_unit_id",
       "rank_id",
       "group_class_id",
     ];
@@ -371,17 +372,17 @@
   </div>
   <Table>
     <TableHead class="border-y border-gray-200 bg-gray-100 dark:border-gray-700">
-      <TableHeadCell class="w-4 p-4"><Checkbox /></TableHeadCell>
-      {#each ['Name', 'Position', 'Rank', 'Group/Class', 'Unit', 'Actions'] as title}
+      <TableHeadCell class="w-4 p-4"></TableHeadCell>
+      {#each ['Name', 'Position', 'Rank', 'Group/Class', 'Org Unit', 'Work Unit', 'Actions'] as title}
         <TableHeadCell class="p-4 font-medium">{title}</TableHeadCell>
       {/each}
     </TableHead>
     <TableBody>
       {#each employees as employee}
         <TableBodyRow class="text-base">
-          <TableBodyCell class="w-4 p-4"><Checkbox /></TableBodyCell>
+          <TableBodyCell class="w-4 p-4"></TableBodyCell>
           <TableBodyCell class="w-60 mr-12 flex items-center space-x-6 p-4 whitespace-nowrap">
-            <Avatar src={imagesPath('', 'users')} />
+            <!-- <Avatar src={imagesPath('', 'users')} /> -->
             <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
               <div class="text-base font-semibold text-gray-900 dark:text-white w-60 max-w-xs whitespace-normal break-words">{employee.name}</div>
               <div class="text-sm font-normal text-gray-500 dark:text-gray-300">{employee.ein}</div>
@@ -392,6 +393,7 @@
           </TableBodyCell>
           <TableBodyCell class="p-4 w-50 max-w-xs whitespace-normal break-words">{employee.rank}</TableBodyCell>
           <TableBodyCell class="p-4">{employee.group_class}</TableBodyCell>
+          <TableBodyCell class="p-4 w-32 max-w-xs whitespace-normal break-words">{employee.organizational_unit}</TableBodyCell>
           <TableBodyCell class="p-4 w-32 max-w-xs whitespace-normal break-words">{employee.work_unit}</TableBodyCell>
           <!-- <TableBodyCell class="p-4 font-normal">
             <div class="flex items-cent/er gap-2">
