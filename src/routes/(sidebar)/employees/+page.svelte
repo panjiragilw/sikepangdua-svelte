@@ -51,7 +51,7 @@
   ): Promise<void> {
     try {
       const apiBase = getApiBaseUrl();
-      console.log(apiBase); 
+      // console.log(apiBase); 
 
       let apiURL = `${apiBase}/api/employee/list`;
       let urlQuery: string = ""
@@ -76,7 +76,7 @@
       }
     
       const res = await fetch(apiURL);
-      console.log(res);
+      // console.log(res);
 
       
       const contentType = res.headers.get('content-type') ?? '';
@@ -201,7 +201,7 @@
     // Hit API add employee
     try {
       const apiBase = getApiBaseUrl();
-      console.log(apiBase);
+      // console.log(apiBase);
 
       const jsonPayloadStr = JSON.stringify(jsonPayload);
       const res = await fetch(`${apiBase}/api/employee/`, {
@@ -221,8 +221,10 @@
       openEmployee = false;
       // Muat ulang data tabel
       searchQuery = "";
+      alert("Add employee success");
       fetchData(); 
     } catch (e) {
+      alert("Failed to add employee");
       console.error("Failed to add:", e);
     }
   }
@@ -282,8 +284,10 @@
       openEmployee = false;
       // Muat ulang data tabel
       searchQuery = "";
+      alert("Edit employee data success");
       fetchData(); 
     } catch (e) {
+      alert("Failed to edit employee data");
       console.error("Failed to edit:", e);
     }
   }
@@ -293,9 +297,9 @@
     // console.log(e.detail);
 
     const apiBase = getApiBaseUrl();
-    console.log(apiBase);
+    // console.log(apiBase);
     if (e.detail === true) {
-      console.log("id: ", current_employee.id);
+      // console.log("id: ", current_employee.id);
       try {
         const res = await fetch(`${apiBase}/api/employee/${current_employee.id}`, {
           method: 'DELETE',
@@ -310,8 +314,10 @@
         openEmployee = false;
         // Muat ulang data tabel
         searchQuery = "";
+        alert("Delete employee success");
         fetchData(); 
       } catch (e) {
+        alert("Failed to delete employee");
         console.error("Failed to delete:", e);
       }
     }

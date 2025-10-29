@@ -184,7 +184,7 @@
               case 4:
                 skpData[0].docId = Number(doc.id)
               case 5:
-                skpData[0].docId = Number(doc.id)
+                skpData[1].docId = Number(doc.id)
             }
           }
           
@@ -280,8 +280,8 @@
         break;
     }
 
-    // console.log("jsonPayload: ", jsonPayload, performanceDetailId);
-    if (json.length > 1) {
+    // console.log("jsonPayload: ", jsonPayload, docKey, performanceDetailId, skpData);
+    if (Object.keys(jsonPayload).length > 1) {
       const apiBase = getApiBaseUrl();
       console.log(apiBase);
       if (performanceDetailId > 0) {
@@ -337,6 +337,7 @@
     const form = e.currentTarget as HTMLFormElement;
     const initialFormData = new FormData(form);
     const formEntryData = Object.fromEntries(initialFormData.entries());
+    // console.log("formEntryData: ", formEntryData);
 
     const existingDocKeys = Object.keys(prefilledUrls);
     
@@ -360,14 +361,14 @@
           // console.log("exist: ", key, isExistingDoc)
 
           const apiBase = getApiBaseUrl();
-          console.log(apiBase);
+          // console.log(apiBase);
           if (isExistingDoc) {
             // console.log(`update for: ${key} `, isExistingDoc)
             const res = await fetch(`${apiBase}/api/employee/document/${fetchExistingDocumentID(key, documents)}`, {
               method: 'PUT',
               body: uploadFormData, 
             });
-            console.log(res);
+            // console.log(res);
 
             const contentType = res.headers.get('content-type') ?? '';
             const text = await res.text();
@@ -385,7 +386,7 @@
             }
             
             if (["skp-1", "skp-2"].includes(key)) {
-              console.log("process skp: ", key, skpData)
+              // console.log("process skp: ", key, skpData)
               if ((key === "skp-1" && skpData[0].docId > 0) || (key === "skp-2" && skpData[1].docId > 0)) {
                 insertUpdatePerformanceDetail(key, Number(employeeId))
               }
@@ -419,12 +420,14 @@
               const docId = json.data.last_inserted_id as number;
 
               // console.log("docID: ", docId.last_inserted_id);
-
+                // console.log("key: ", key);
                 switch (key) {
                 case "skp-1":
                   skpData[0].docId = docId;
+                  // break;
                 case "skp-2":
                   skpData[1].docId = docId;
+                  // break;
               }
               // console.log("process skp: ", key, skpData)
               if ((key === "skp-1" && skpData[0].docId > 0) || (key === "skp-2" && skpData[1].docId > 0)) {
@@ -480,6 +483,7 @@
     // employeeId?: number,
   ): Promise<void> {
     const employeeId = data.id as number; 
+    // console.log("employeeID fetchPD: ", employeeId)
 
     try {
       const apiBase = getApiBaseUrl();
@@ -497,7 +501,7 @@
       }
 
       const res = await fetch(apiURL);
-      console.log(res);
+      // console.log("res fetchPD:", res);
 
       const contentType = res.headers.get('content-type') ?? '';
       const text = await res.text();
@@ -518,10 +522,9 @@
       if (performanceDetails && performanceDetails.length > 0) {
           skpData.forEach(skpItem => {
               const foundDetail = performanceDetails?.find(
-                  // Cocokkan berdasarkan ID Tipe Dokumen
                   detail => detail.document_type_id === skpItem.docTypeId 
               );
-
+              // console.log("foundDetail: ", foundDetail);
               if (foundDetail) {
                   skpItem.id = foundDetail.id;
                   skpItem.docId = foundDetail.document_id; // Tambahkan ini jika perlu ID dokumen

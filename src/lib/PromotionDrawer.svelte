@@ -88,7 +88,7 @@
     });
 
     dispatch('submit', payload);
-    console.log("DISPATCHED promoted: ", payload);
+    // console.log("DISPATCHED promoted: ", payload);
     
     open = false;
   }

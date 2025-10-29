@@ -35,7 +35,7 @@
   ): Promise<void> {
     try {
       const apiBase = getApiBaseUrl();
-      console.log(apiBase);
+      // console.log(apiBase);
 
       let apiURL = `${apiBase}/api/employee/check-promotion/regular/list`;
       let urlQuery: string = ""
@@ -47,7 +47,7 @@
         apiURL += `?${urlQuery}`
       }
       const res = await fetch(apiURL);
-      console.log(res);
+      // console.log(res);
 
       const contentType = res.headers.get('content-type') ?? '';
       const text = await res.text();
@@ -159,10 +159,10 @@
 
     try {
       const apiBase = getApiBaseUrl();
-      console.log(apiBase); 
+      // console.log(apiBase); 
       
       const res = await fetch(`${apiBase}/api/employee/documents/legal?ein=${ein}`);
-      console.log(res);
+      // console.log(res);
 
       const contentType = res.headers.get('content-type') ?? '';
       const text = await res.text();
@@ -227,7 +227,7 @@
         uploadFormData.append('document_file', promotedFile);
 
         const apiBase = getApiBaseUrl();
-        console.log(apiBase);
+        // console.log(apiBase);
         // 4. Execute the single API call
         const res = await fetch(`${apiBase}/api/employee/promoted`, {
             method: 'POST',
@@ -236,13 +236,14 @@
 
         if (!res.ok) {
             const errorText = await res.text();
+            console.error(`Process for promoted employee failed. Status: ${res.status}`);
             throw new Error(`Upload failed. Status: ${res.status}. Response: ${errorText}`);
         }
         
-        console.log("Promotion document uploaded and data updated successfully.");
+        // console.log("Promotion document uploaded and data updated successfully.");
 
     } catch (e) {
-        console.error("Failed to handle promotion document:", e);
+        alert("Failed to process promoted employee");
     }
   }
 
@@ -278,7 +279,7 @@
     // Hit API update employee
     try {
       const apiBase = getApiBaseUrl();
-      console.log(apiBase);
+      // console.log(apiBase);
       const jsonPayloadStr = JSON.stringify(jsonPayload);
       // console.log("jsonPayloadStr: ", jsonPayloadStr);
       const res = await fetch(`${apiBase}/api/employee/${payload.id}`, {
@@ -298,9 +299,12 @@
       // openEmployee = false;
       // Muat ulang data tabel
       // searchQuery = "";
+      
+      alert('Promoted employee data update success');
       fetchData(); 
     } catch (e) {
-      console.error("Failed to edit:", e);
+      alert("Failed to update");
+      // console.error("Failed to edit:", e);
     }
   }
 

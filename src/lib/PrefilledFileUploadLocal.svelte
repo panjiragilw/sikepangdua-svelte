@@ -28,17 +28,19 @@
         },
         body: JSON.stringify({ url: rawUrl }),
       });
-      console.log(res);
       
       const contentType = res.headers.get('content-type') ?? '';
       const text = await res.text();
+      // console.log("text SignURL: ", text, res.ok);
 
       if (!res.ok || !contentType.includes('application/json')) {
         throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
       }
 
       const json = JSON.parse(text);
-      if (json.status !== 200) {
+      // console.log("json sign url: ", json);
+
+      if (json.status && json.status !== 200) {
         const errJson = json;
         throw new Error(errJson);
       }
@@ -52,7 +54,7 @@
         alert('Failed to fetch signed URL.');
       }
     } catch (e) {
-      console.error('Failed fetch signed URL:', e);
+      // console.error('Failed fetch signed URL:', e);
       alert('There is an error when opened the file.');
     }
   }
