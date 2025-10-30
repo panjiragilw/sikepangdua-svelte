@@ -247,6 +247,7 @@ export interface DeleteModalProps {
 export interface UserModalProps {
   open: boolean;
   data: Record<string, string>;
+  type: string;
 }
 
 export interface DeleteDrawerProps {
@@ -746,4 +747,14 @@ export type PerformanceDetail = {
   type: string;
   start_date: string;
   end_date: string;
+}
+
+export type GeneralDetail = {
+  id: number;
+  employee_id: number;
+  phone_number: string;
+  email: string;
+  last_education_level: string;
+  last_education_program: string;
+  gender: string;
 }

@@ -1,14 +1,14 @@
 <script lang="ts">
   import { onMount, createEventDispatcher } from "svelte";
   import { Button, Input, Label, Modal, Radio, Select } from 'flowbite-svelte';
-  import type { OrganizationalUnit, UserModalProps } from './types';
+  import type { GeneralDetail, OrganizationalUnit, UserModalProps } from './types';
   import type { Rank, WorkUnit } from '$lib/types'
     import { rsl } from "../routes/utils/highlight/languages";
     import { getApiBaseUrl } from "./api";
 
   const dispatch = createEventDispatcher();
 
-  let { open = $bindable(true), data }: UserModalProps = $props();
+  let { open = $bindable(true), data, type }: UserModalProps = $props();
   // Variabel untuk menyimpan nilai yang dipilih
   let positionType = $state('administrative');
   let employeeType = $state('pns');
@@ -18,6 +18,24 @@
   let selectedRankId: string = $state(""); 
   let selectedOrgUnitId: string = $state(""); 
   let selectedWorkUnitId: string = $state(""); 
+
+  const educationLevels = [
+    { value: 's-3', name: 'S3'},
+    { value: 's-2', name: 'S2/Dokter/Apoteker/Ners'},
+    { value: 's-1/d-4', name: 'S1/D4'},
+    { value: 'd-3', name: 'D3'},
+    { value: 'd-2', name: 'D2'},
+    { value: 'd-1', name: 'D1'},
+    { value: 'sma/smk', name: 'SMA/SMK'},
+    // { value: 'smp-kejuruan', name: 'Lainnya'},
+    { value: 'smp', name: 'SMP'},
+    { value: 'sd', name: 'SD'},
+  ];
+
+  // Binding data
+  let isEdLevelExisted: boolean = $state(false);
+  let selectedEdLevel: string = $state('');
+  let selectedEdProgram: string = $state('');
 
 
   // Svelte Runes: Effect to reset state when switching from Edit to Add
@@ -37,6 +55,9 @@
       selectedRankId = '';
       selectedOrgUnitId = '';
       selectedWorkUnitId = '';
+      selectedEdLevel = '';
+      selectedEdProgram = '';
+      isEdLevelExisted = false;
     }
   });
 
@@ -46,6 +67,7 @@
   }
 
   function init(form: HTMLFormElement) {
+    // console.log("type: ", type);
     if (data?.group_class) [data.group, data.class] = data.group_class.split('/');    
     for (const key in data) {
       switch (key) {
@@ -74,6 +96,12 @@
         case 'work_unit_id':
           selectedWorkUnitId = data[key];
           break;
+        // case 'last_education_level':
+        //   selectedLevel = data[key]
+        //   break;
+        // case 'last_education_program':
+        //   selectedProgram = data[key]
+        //   break;
       }
 
       const el = form.elements.namedItem(key);
@@ -85,6 +113,25 @@
           el.value = data[key];
         }
       }
+    }
+
+    isEdLevelExisted = false
+    if (type === 'edit') {
+      selectedEdLevel = ''; 
+      selectedEdProgram = '';
+      fetchGeneralDetail().then(() => {
+        // console.log("generalDetails: ", generalDetails);
+        if (generalDetails && generalDetails.length > 0) {
+          // console.log("ed_level", generalDetails[0].last_education_level);
+          if (generalDetails[0].last_education_level != "") {
+            selectedEdLevel = generalDetails[0].last_education_level;
+            selectedEdProgram = generalDetails[0].last_education_program;
+            isEdLevelExisted = true
+          }
+        }
+      }).catch(error => {
+          console.error("Error while wait general details:", error);
+      });;
     }
   }
 
@@ -120,6 +167,8 @@
     if (isEditMode) {
       // Include original ID for update/edit
       payload.id = data.id; 
+      payload.isEditEducation = isEdLevelExisted;
+      payload.general_detail_id = generalDetails && generalDetails.length > 0 ? generalDetails[0].id : 0;
       // console.log('SAVE (EDIT) Payload:', payload);
       // Dispatch event untuk update
       dispatch('saveEmployee', payload);
@@ -135,19 +184,21 @@
 
   type ApiRankListResponseSuccess = { status: number; data: Rank[] };
   type ApiOrganizationalUnitListResponseSuccess = { status: number; data: OrganizationalUnit[] };
+  type ApiGeneralDetailListResponseSuccess = { status: number; data: GeneralDetail[] };
   type ApiListResponseError = { status: number; error: string; logMsg: string };
+  let error = $state<string | null>(null);
   let ranks = $state<Rank[] | undefined>(undefined);
   let orgUnits = $state<OrganizationalUnit[] | undefined>(undefined);
+  let generalDetails = $state<GeneralDetail[] | undefined>(undefined);
   let workUnits = $state<WorkUnit[] | undefined>(undefined);
-  let error = $state<string | null>(null);
 
   async function fetchRankList(): Promise<void> {
     try {
       const apiBase = getApiBaseUrl();
-      console.log(apiBase);
+      // console.log(apiBase);
 
       const res = await fetch(`${apiBase}/api/employee/ranks`);
-      console.log(res);
+      // console.log(res);
       
       const contentType = res.headers.get('content-type') ?? '';
       const text = await res.text();
@@ -176,10 +227,10 @@
   async function fetchOrgUnit(): Promise<void> {
     try {
       const apiBase = getApiBaseUrl();
-      console.log(apiBase);  
+      // console.log(apiBase);  
       
       const res = await fetch(`${apiBase}/api/unit/organizational-units`);
-      console.log(res);
+      // console.log(res);
 
       const contentType = res.headers.get('content-type') ?? '';
       const text = await res.text();
@@ -201,6 +252,37 @@
     } finally {
       // console.log("org units: ", orgUnits);
     }
+  }
+
+  async function fetchGeneralDetail(): Promise<void> {
+    try {
+      const apiBase = getApiBaseUrl();
+      // console.log(apiBase);  
+      
+      const res = await fetch(`${apiBase}/api/employee/detail/general/list?employee_id=${data.id}`);
+      // console.log(res);
+
+      const contentType = res.headers.get('content-type') ?? '';
+      const text = await res.text();
+      
+      if (!res.ok || !contentType.includes('application/json')) {
+        throw new Error(`Invalid response: ${res.status} — ${text.slice(0, 100)}`);
+      }       
+
+      const json = JSON.parse(text) as ApiGeneralDetailListResponseSuccess | ApiListResponseError;
+      if (json.status !== 200) {
+        const errJson = json as ApiListResponseError;
+        throw new Error(errJson.error);
+      }
+      const successResponse = json as ApiGeneralDetailListResponseSuccess;
+      generalDetails = successResponse.data;
+      // console.log("generalDetails: ", generalDetails);
+      // selectedLevel = generalDetails[0].last_education_level;
+      // selectedProgram = generalDetails[0].last_education_program;
+    } catch (e: any) {
+      generalDetails = [];
+      error = e.message;
+    } 
   }
 
   // interface ApiPayload {
@@ -239,6 +321,8 @@
   onMount(() => {
     fetchRankList();
     fetchOrgUnit();
+
+    // if (type === 'edit') fetchGeneralDetail();
   });
 </script>
 
@@ -302,35 +386,35 @@
       </div>
 
       <!-- <div class="grid grid-cols-12 gap-4">  -->
-       <Label class="col-span-6 space-y-2 sm:col-span-3">
-        <span>Organizational Unit</span>
-        <Select 
-          name="org_unit_id" 
-          bind:value={selectedOrgUnitId}
-          placeholder="Choose Organizational Unit"
-          onchange={handleOrgUnitChange}
-          >
-          {#each orgUnits || [] as {id, name}}
-            <option value={id}>
-                {name}
-            </option>
-          {/each}
-        </Select>
-      </Label>
+        <Label class="col-span-6 space-y-2 sm:col-span-3">
+          <span>Organizational Unit</span>
+          <Select 
+            name="org_unit_id" 
+            bind:value={selectedOrgUnitId}
+            placeholder="Choose Organizational Unit"
+            onchange={handleOrgUnitChange}
+            >
+            {#each orgUnits || [] as {id, name}}
+              <option value={id}>
+                  {name}
+              </option>
+            {/each}
+          </Select>
+        </Label>
 
-      <Label class="col-span-6 space-y-2 sm:col-span-3">
-        <span>Work Unit</span>
-        <Select 
-          name="work_unit_id" 
-          bind:value={selectedWorkUnitId}
-          placeholder="Choose Work Unit" disabled={isWorkUnitDisabled}>
-          {#each sOrgUnit?.work_units || [] as {id, name}}
-            <option value={id}>
-                {name}
-            </option>
-          {/each}
-        </Select>
-      </Label>
+        <Label class="col-span-6 space-y-2 sm:col-span-3">
+          <span>Work Unit</span>
+          <Select 
+            name="work_unit_id" 
+            bind:value={selectedWorkUnitId}
+            placeholder="Choose Work Unit" disabled={isWorkUnitDisabled}>
+            {#each sOrgUnit?.work_units || [] as {id, name}}
+              <option value={id}>
+                  {name}
+              </option>
+            {/each}
+          </Select>
+        </Label>
       <!-- </div> -->
 
         <Label class="col-span-6 space-y-2 sm:col-span-3">
@@ -352,6 +436,32 @@
             required 
             class="w-full"
           />
+        </Label>
+
+        <Label class="col-span-6 space-y-2 sm:col-span-3">
+          <span>Last Education</span>
+          <div class="flex min-w-0">
+            <Select
+              name="last_education_level"
+              bind:value={selectedEdLevel}
+              class="w-20 sm:w-20 md:w-20 rounded-r-none border-r-0 flex-shrink-0"
+              aria-label="Education level"
+              placeholder="Choose Level"
+              required
+            >
+               {#each educationLevels as { value, name }}
+                 <option value={value}>{name}</option>
+               {/each}
+             </Select>
+ 
+            <Input
+              name="last_education_program"
+              bind:value={selectedEdProgram}
+              placeholder="Program / Major (e.g. Informatics)"
+              class="flex-1 rounded-l-none min-w-0"
+              aria-label="Education program"
+            />
+           </div>
         </Label>
           
         <div class="col-span-6 sm:col-span-3 space-y-2">

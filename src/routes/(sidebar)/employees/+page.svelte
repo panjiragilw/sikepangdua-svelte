@@ -16,6 +16,7 @@
 
   let openEmployee: boolean = $state(false); // modal control
   let openDelete: boolean = $state(false); // modal control
+  let isEdit: boolean = $state(false); // modal control
 
   let tableLoading = $state(false);
 
@@ -78,7 +79,6 @@
       const res = await fetch(apiURL);
       // console.log(res);
 
-      
       const contentType = res.headers.get('content-type') ?? '';
       const text = await res.text();
 
@@ -122,7 +122,7 @@
         // Log error jika ada masalah di salah satu promise
         console.error("Error during data fetching and delay:", e);
     } finally {
-        tableLoading = false; // ✅ NONAKTIFKAN LOADING setelah semua proses selesai
+        tableLoading = false; // 
     }
   }
 
@@ -178,7 +178,7 @@
       "position_type", 
       "sds_last_group", 
       "employee_type", 
-      "parent_agency"
+      "parent_agency",
     ];
     const allowedKeysNumber = [
       "work_unit_id",
@@ -204,22 +204,22 @@
       // console.log(apiBase);
 
       const jsonPayloadStr = JSON.stringify(jsonPayload);
-      const res = await fetch(`${apiBase}/api/employee/`, {
+      const _ = await fetch(`${apiBase}/api/employee/`, {
         method: 'POST',
         body: jsonPayloadStr, 
         headers: {
             'Content-Type': 'application/json',
         },
+      }).then((res) => {
+        if (!res.ok) {
+          console.error(`Add failed. Status: ${res.status}`, jsonPayload);
+          throw new Error(`Invalid response: ${res.status}`);
+        } 
       });
 
-      // Cek status HTTP. Di sini diasumsikan status 2xx adalah sukses
-      if (!res.ok) {
-        console.error(`Add failed. Status: ${res.status}`, jsonPayload);
-        throw new Error(`Invalid response: ${res.status}`);
-      } 
-      // Tutup modal setelah sukses
+      handleAddGeneralDetail(e);
+
       openEmployee = false;
-      // Muat ulang data tabel
       searchQuery = "";
       alert("Add employee success");
       fetchData(); 
@@ -232,7 +232,7 @@
   async function handleSaveEmployee(e: CustomEvent) {
     e.preventDefault();
     const payload = e.detail; // Ini adalah payload dari modal
-    console.log("Receive event SAVE (EDIT) with payload:", payload);
+    // console.log("Receive event SAVE (EDIT) with payload:", payload);
     
     const allowedKeysStr = [
       "name", 
@@ -241,7 +241,7 @@
       "position_type", 
       "sds_last_group", 
       "employee_type", 
-      "parent_agency"
+      "parent_agency",
     ];
     const allowedKeysNumber = [
       "work_unit_id",
@@ -265,25 +265,35 @@
     // Hit API add employee
     try {
       const apiBase = getApiBaseUrl();
-      console.log(apiBase);
+      // console.log(apiBase);
 
       const jsonPayloadStr = JSON.stringify(jsonPayload);
-      const res = await fetch(`${apiBase}/api/employee/${payload.id}`, {
+      const _ = await fetch(`${apiBase}/api/employee/${payload.id}`, {
         method: 'PUT',
         body: jsonPayloadStr, 
         headers: {
             'Content-Type': 'application/json',
         },
+      }).then((res)=> {
+        if (!res.ok) {
+          console.error(`Edit failed. Status: ${res.status}`, jsonPayload);
+          throw new Error(`Invalid response: ${res.status}`);
+        } 
       });
 
-      // Cek status HTTP. Di sini diasumsikan status 2xx adalah sukses
-      if (!res.ok) {
-        console.error(`Edit failed. Status: ${res.status}`, jsonPayload);
-        throw new Error(`Invalid response: ${res.status}`);
-      } 
-      // Tutup modal setelah sukses
+      // handleUpdateGeneralDetail(e);
+      switch (payload.isEditEducation) {
+        case true:
+          // console.log("edit General detail");
+          await handleUpdateGeneralDetail(e);
+          break;
+        default:
+          //  console.log("add General detail");
+          await handleAddGeneralDetail(e);          
+          break;
+      }
+
       openEmployee = false;
-      // Muat ulang data tabel
       searchQuery = "";
       alert("Edit employee data success");
       fetchData(); 
@@ -324,6 +334,91 @@
     }
   }
 
+  async function handleAddGeneralDetail(e: CustomEvent) {
+    e.preventDefault();
+    const payload = e.detail;
+    // console.log("Receive event ADD with payload:", payload);
+
+    const allowedKeysStr = [
+      "last_education_level",
+      "last_education_program",
+    ];
+    const jsonPayload: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(payload)) {
+      if (allowedKeysStr.includes(key)) {
+        // console.log(key, value);
+        jsonPayload[key] = String(value ?? '');
+      }
+    }
+
+    jsonPayload["employee_id"] = payload.id;
+
+    // console.log("ADD with:", jsonPayload);
+
+    // Hit API add general detail
+    try {
+      const apiBase = getApiBaseUrl();
+      // console.log(apiBase);
+
+      const jsonPayloadStr = JSON.stringify(jsonPayload);
+      const res = await fetch(`${apiBase}/api/employee/detail/general`, {
+        method: 'POST',
+        body: jsonPayloadStr, 
+        headers: {
+            'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) {
+        console.error(`Add general detailfailed. Status: ${res.status}`, jsonPayload);
+        throw new Error(`Invalid response add general detail: ${res.status}`);
+      } 
+    } catch (e) {
+      console.error("Failed to add general detail:", e);
+    }
+  }
+
+  async function handleUpdateGeneralDetail(e: CustomEvent) {
+    e.preventDefault();
+    const payload = e.detail;
+    // console.log("Receive event SAVE (EDIT) with payload:", payload);
+    
+    const allowedKeysStr = [
+      "last_education_level",
+      "last_education_program",
+    ];
+    const jsonPayload: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(payload)) {
+      if (allowedKeysStr.includes(key)) {
+        // console.log(key, value);
+        jsonPayload[key] = String(value ?? '');
+      }
+    }
+    // console.log("SAVE (EDIT) with:", jsonPayload);
+
+    // Hit API edit general detail
+    try {
+      const apiBase = getApiBaseUrl();
+      // console.log(apiBase);
+
+      const jsonPayloadStr = JSON.stringify(jsonPayload);
+      const res = await fetch(`${apiBase}/api/employee/detail/general/${payload.general_detail_id}`, {
+        method: 'PUT',
+        body: jsonPayloadStr, 
+        headers: {
+            'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) {
+        console.error(`Edit general detail failed. Status: ${res.status}`, jsonPayload);
+        throw new Error(`Invalid response edit general detail: ${res.status}`);
+      } 
+    } catch (e) {
+      console.error("Failed to edit general detail:", e);
+    }
+  }
+
   onMount(fetchData);
 </script>
 
@@ -360,7 +455,7 @@
       </div>
       {#snippet end()}
         <div class="flex items-center space-x-2">
-          <Button size="sm" class="gap-2 px-3 whitespace-nowrap" onclick={() => ((current_employee = {}), (openEmployee = true))}>
+          <Button size="sm" class="gap-2 px-3 whitespace-nowrap" onclick={() => ((current_employee = {}), (openEmployee = true), (isEdit=false))}>
             <PlusOutline size="sm" />Add
           </Button>
           <!-- <Button size="sm" color="alternative" class="gap-2 px-3">
@@ -402,7 +497,7 @@
             </div>
           </TableBodyCell> -->
           <TableBodyCell class="space-x-2 p-4">
-            <Button size="sm" class="gap-2 px-3" onclick={() => ((current_employee = employee), (openEmployee = true))}>
+            <Button size="sm" class="gap-2 px-3" onclick={() => ((current_employee = employee), (openEmployee = true), (isEdit=true))}>
               <EditOutline size="sm" /> Edit
             </Button>
             <Button color="red" size="sm" class="gap-2 px-3" onclick={() => ((current_employee = employee), (openDelete = true))}>
@@ -425,7 +520,8 @@
 
 <EmployeeModal 
   bind:open={openEmployee} 
-  data={current_employee} 
+  data={current_employee}
+  type={isEdit ? "edit" : "add"}
   on:addEmployee={handleAddEmployee}
   on:saveEmployee={handleSaveEmployee}
 />
